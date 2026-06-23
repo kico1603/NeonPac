@@ -890,7 +890,7 @@ const firebaseConfig = {
       <span data-i18n="hint_tail">· Come puntos · Esquiva los 6 fantasmas</span>
     </div>
     <div style="position: fixed; bottom: 8px; right: 12px; font-size: 13px; color: var(--muted); font-family: 'Press Start 2P', monospace; letter-spacing: 1px;">
-      v1.1.1
+      v1.3
     </div>
   </section>
 
@@ -1205,7 +1205,7 @@ const I18N = {
     level: "LEVEL",
     world: "WORLD",
     use_power_times: n => `Use the power-up successfully ${n} times.`,
-    eat_pct: p => `Eat at least ${p}% of the dots.`,
+    eat_dots: d => `Eat at least ${d} dots.`,
     pad_connected: "🎮 Gamepad connected",
     inverted: "CONTROLS INVERTED",
     adv_title: "ADVENTURE MODE",
@@ -1319,7 +1319,7 @@ const I18N = {
     level: "NIVEL",
     world: "MUNDO",
     use_power_times: n => `Usa el power-up con éxito ${n} veces.`,
-    eat_pct: p => `Cómete al menos el ${p}% de las bolas.`,
+    eat_dots: d => `Cómete al menos ${d} bolas.`,
     pad_connected: "🎮 Mando conectado",
     inverted: "CONTROLES INVERTIDOS",
     adv_title: "MODO AVENTURA",
@@ -1433,7 +1433,7 @@ const I18N = {
     level: "NIVEAU",
     world: "MONDE",
     use_power_times: n => `Utilise le power-up avec succès ${n} fois.`,
-    eat_pct: p => `Mange au moins ${p}% des points.`,
+    eat_dots: d => `Mange au moins ${d} points.`,
     pad_connected: "🎮 Manette connectée",
     inverted: "CONTRÔLES INVERSÉS",
     adv_title: "MODE AVENTURE",
@@ -1547,7 +1547,7 @@ const I18N = {
     level: "NÍVEL",
     world: "MUNDO",
     use_power_times: n => `Use o power-up com sucesso ${n} vezes.`,
-    eat_pct: p => `Coma pelo menos ${p}% das bolas.`,
+    eat_dots: d => `Coma pelo menos ${d} bolas.`,
     pad_connected: "🎮 Controle conectado",
     inverted: "CONTROLES INVERTIDOS",
     adv_title: "MODO AVENTURA",
@@ -1661,7 +1661,7 @@ const I18N = {
     level: "LEVEL",
     world: "WELT",
     use_power_times: n => `Nutze das Power-up ${n} Mal erfolgreich.`,
-    eat_pct: p => `Friss mindestens ${p}% der Punkte.`,
+    eat_dots: d => `Friss mindestens ${d} Punkte.`,
     pad_connected: "🎮 Controller verbunden",
     inverted: "STEUERUNG UMGEKEHRT",
     adv_title: "ABENTEUER-MODUS",
@@ -1775,7 +1775,7 @@ const I18N = {
     level: "关卡",
     world: "世界",
     use_power_times: n => `成功使用道具 ${n} 次。`,
-    eat_pct: p => `吃掉至少 ${p}% 的豆子。`,
+    eat_dots: d => `吃掉至少 ${d} 颗豆子。`,
     pad_connected: "🎮 手柄已连接",
     inverted: "控制已反转",
     adv_title: "冒险模式",
@@ -1889,7 +1889,7 @@ const I18N = {
     level: "स्तर",
     world: "दुनिया",
     use_power_times: n => `पावर-अप ${n} बार सफलतापूर्वक उपयोग करें।`,
-    eat_pct: p => `कम से कम ${p}% बिंदुएं खाएं।`,
+    eat_dots: d => `कम से कम ${d} बिंदुएं खाएं।`,
     pad_connected: "🎮 गेमपैड कनेक्ट हुआ",
     inverted: "नियंत्रण उल्टे",
     adv_title: "एडवेंचर मोड",
@@ -2003,7 +2003,7 @@ const I18N = {
     level: "المستوى",
     world: "العالم",
     use_power_times: n => `استخدم القوة بنجاح ${n} مرات.`,
-    eat_pct: p => `كل ما لا يقل عن ${p}% من النقاط.`,
+    eat_dots: d => `كل ما لا يقل عن ${d} نقطة.`,
     pad_connected: "🎮 تم توصيل وحدة التحكم",
     inverted: "التحكم معكوس",
     adv_title: "وضع المغامرة",
@@ -3332,6 +3332,10 @@ function advPowerupsForWorld(w) {
   return ADV_POWERUP_UNLOCKS.slice(0, Math.max(0, w - 1));
 }
 
+// Bolas promedio que genera el mapa de cada mundo (medido sobre 30 mapas por mundo).
+// Sirve para fijar un objetivo en NÚMERO ABSOLUTO en vez de un porcentaje abstracto.
+const ADV_AVG_DOTS = { 1: 304, 2: 358, 3: 419, 4: 479, 5: 549, 6: 616, 7: 695, 8: 770, 9: 856, 10: 892 };
+
 function getAdvLevelConfig(n) {
   const world = Math.ceil(n / 10);
   const pos = (n - 1) % 10 + 1;
@@ -3343,6 +3347,8 @@ function getAdvLevelConfig(n) {
   const loopPct = Math.max(.18, .4 - world * .02);
   const powerups = advPowerupsForWorld(world);
   const dotTarget = Math.round(25 + (n - 1) / 99 * 65);
+  // Objetivo en número absoluto: % del promedio de bolas del mundo, redondeado a 5.
+  const dotGoal = Math.max(5, Math.round(ADV_AVG_DOTS[world] * dotTarget / 100 / 5) * 5);
   const newPowerup = world >= 2 ? ADV_POWERUP_UNLOCKS[world - 2] : null;
   let mode, modeCfg = {};
   switch (pos) {
@@ -3422,7 +3428,8 @@ function getAdvLevelConfig(n) {
     mazeH: mazeH,
     loopPct: loopPct,
     powerups: powerups,
-    dotTarget: dotTarget
+    dotTarget: dotTarget,
+    dotGoal: dotGoal
   };
 }
 
@@ -5106,7 +5113,7 @@ class Game {
     const mode = cfg.mode;
     // Total de bolas al empezar y cuántas hacen falta según el % del nivel.
     st.dotsAtStart = this.totalDots;
-    st.dotsNeeded = Math.max(1, Math.ceil(this.totalDots * (cfg.dotTarget || 100) / 100));
+    st.dotsNeeded = Math.min(this.totalDots, cfg.dotGoal || Math.ceil(this.totalDots * (cfg.dotTarget || 100) / 100));
     this.ghosts = this.ghosts.slice(0, cfg.numGhosts);
     this.setGhostRevive(cfg.ghostRevive || 4);
     this.stars = this.stars.filter(s => this.ghosts.includes(s.target));
@@ -7495,7 +7502,7 @@ class Game {
   }
   renderGhost(g) {
     if (g.releaseTimer > 0) return;
-    if (this.adventure && this.adventure.config.mode === "INVISIBLE" && !g.eaten && g.frightTimer <= 0) {
+    if (this.adventure && this.adventure.config.mode === "INVISIBLE" && !g.eaten) {
       const phase = this.elapsedTime % 3;
       if (phase > 1) {
         const ctx = this.ctx;
@@ -8469,7 +8476,7 @@ function showAdvMissionBriefing(n) {
   let goalText = mi.g;
   if (cfg.mode === "POWERUP_TRIAL") goalText = t("use_power_times", cfg.modeCfg.uses);
   if ([ "CLASSIC", "INVISIBLE", "BLACKOUT", "TIMETRIAL", "DYNAMIC_WALLS", "PORTALS" ].includes(cfg.mode)) {
-    goalText = t("eat_pct", cfg.dotTarget);
+    goalText = t("eat_dots", cfg.dotGoal);
   }
   const box = document.getElementById("adv-grid");
   box.innerHTML = `\n    <div style="text-align:center; padding: 12px 8px;">\n      <div style="font-family:'Press Start 2P',monospace; font-size:10px; color:var(--muted);">${t("level")} ${n} · ${t("world")} ${cfg.world}</div>\n      <div style="font-family:'Press Start 2P',monospace; font-size:18px; color:var(--cyan); margin:14px 0 4px;">${mi.n}</div>\n      ${extra}\n      ${section(t("effect_title"), mi.e, "#bb66ff")}\n      ${section(t("goal_title"), goalText, "#3bff9d")}\n      <div style="margin-top:22px;">\n        <button class="btn yellow" id="btn-adv-play">${t("play")}</button>\n        <button class="btn" id="btn-adv-cancel" style="margin-left:8px;">${t("back")}</button>\n      </div>\n    </div>`;
