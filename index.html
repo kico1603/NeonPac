@@ -890,7 +890,7 @@ const firebaseConfig = {
       <span data-i18n="hint_tail">· Come puntos · Esquiva los 6 fantasmas</span>
     </div>
     <div style="position: fixed; bottom: 8px; right: 12px; font-size: 13px; color: var(--muted); font-family: 'Press Start 2P', monospace; letter-spacing: 1px;">
-      v1.0
+      v1.1.1
     </div>
   </section>
 
@@ -1205,6 +1205,7 @@ const I18N = {
     level: "LEVEL",
     world: "WORLD",
     use_power_times: n => `Use the power-up successfully ${n} times.`,
+    eat_pct: p => `Eat at least ${p}% of the dots.`,
     pad_connected: "🎮 Gamepad connected",
     inverted: "CONTROLS INVERTED",
     adv_title: "ADVENTURE MODE",
@@ -1318,6 +1319,7 @@ const I18N = {
     level: "NIVEL",
     world: "MUNDO",
     use_power_times: n => `Usa el power-up con éxito ${n} veces.`,
+    eat_pct: p => `Cómete al menos el ${p}% de las bolas.`,
     pad_connected: "🎮 Mando conectado",
     inverted: "CONTROLES INVERTIDOS",
     adv_title: "MODO AVENTURA",
@@ -1431,6 +1433,7 @@ const I18N = {
     level: "NIVEAU",
     world: "MONDE",
     use_power_times: n => `Utilise le power-up avec succès ${n} fois.`,
+    eat_pct: p => `Mange au moins ${p}% des points.`,
     pad_connected: "🎮 Manette connectée",
     inverted: "CONTRÔLES INVERSÉS",
     adv_title: "MODE AVENTURE",
@@ -1544,6 +1547,7 @@ const I18N = {
     level: "NÍVEL",
     world: "MUNDO",
     use_power_times: n => `Use o power-up com sucesso ${n} vezes.`,
+    eat_pct: p => `Coma pelo menos ${p}% das bolas.`,
     pad_connected: "🎮 Controle conectado",
     inverted: "CONTROLES INVERTIDOS",
     adv_title: "MODO AVENTURA",
@@ -1657,6 +1661,7 @@ const I18N = {
     level: "LEVEL",
     world: "WELT",
     use_power_times: n => `Nutze das Power-up ${n} Mal erfolgreich.`,
+    eat_pct: p => `Friss mindestens ${p}% der Punkte.`,
     pad_connected: "🎮 Controller verbunden",
     inverted: "STEUERUNG UMGEKEHRT",
     adv_title: "ABENTEUER-MODUS",
@@ -1770,6 +1775,7 @@ const I18N = {
     level: "关卡",
     world: "世界",
     use_power_times: n => `成功使用道具 ${n} 次。`,
+    eat_pct: p => `吃掉至少 ${p}% 的豆子。`,
     pad_connected: "🎮 手柄已连接",
     inverted: "控制已反转",
     adv_title: "冒险模式",
@@ -1883,6 +1889,7 @@ const I18N = {
     level: "स्तर",
     world: "दुनिया",
     use_power_times: n => `पावर-अप ${n} बार सफलतापूर्वक उपयोग करें।`,
+    eat_pct: p => `कम से कम ${p}% बिंदुएं खाएं।`,
     pad_connected: "🎮 गेमपैड कनेक्ट हुआ",
     inverted: "नियंत्रण उल्टे",
     adv_title: "एडवेंचर मोड",
@@ -1996,6 +2003,7 @@ const I18N = {
     level: "المستوى",
     world: "العالم",
     use_power_times: n => `استخدم القوة بنجاح ${n} مرات.`,
+    eat_pct: p => `كل ما لا يقل عن ${p}% من النقاط.`,
     pad_connected: "🎮 تم توصيل وحدة التحكم",
     inverted: "التحكم معكوس",
     adv_title: "وضع المغامرة",
@@ -2012,8 +2020,8 @@ const MODE_I18N = {
     },
     HUNT: {
       n: "HUNT",
-      e: "Eliminated ghosts don't return. Small dots don't count.",
-      g: "Grab a power dot and eat all the ghosts."
+      e: "Eliminated ghosts don't return. If you run out of power dots, you lose.",
+      g: "Eat all the ghosts using the power dots on the map."
     },
     POWERUP_TRIAL: {
       n: "TRAINING",
@@ -2069,8 +2077,8 @@ const MODE_I18N = {
     },
     HUNT: {
       n: "CAZA",
-      e: "Los fantasmas eliminados no vuelven. Las bolas pequeñas no cuentan.",
-      g: "Coge una bola de poder y cómete a todos los fantasmas."
+      e: "Los fantasmas eliminados no vuelven. Si te quedas sin bolas de poder, pierdes.",
+      g: "Cómete a todos los fantasmas usando las bolas de poder del mapa."
     },
     POWERUP_TRIAL: {
       n: "ENTRENAMIENTO",
@@ -2126,8 +2134,8 @@ const MODE_I18N = {
     },
     HUNT: {
       n: "CHASSE",
-      e: "Les fantômes éliminés ne reviennent pas. Les petits points ne comptent pas.",
-      g: "Prends une super-pastille et mange tous les fantômes."
+      e: "Les fantômes éliminés ne reviennent pas. Si tu n'as plus de super-pastilles, tu perds.",
+      g: "Mange tous les fantômes avec les super-pastilles de la carte."
     },
     POWERUP_TRIAL: {
       n: "ENTRAÎNEMENT",
@@ -2183,8 +2191,8 @@ const MODE_I18N = {
     },
     HUNT: {
       n: "CAÇA",
-      e: "Fantasmas eliminados não voltam. Bolas pequenas não contam.",
-      g: "Pegue uma bola de poder e coma todos os fantasmas."
+      e: "Fantasmas eliminados não voltam. Se ficar sem bolas de poder, você perde.",
+      g: "Coma todos os fantasmas usando as bolas de poder do mapa."
     },
     POWERUP_TRIAL: {
       n: "TREINO",
@@ -2240,8 +2248,8 @@ const MODE_I18N = {
     },
     HUNT: {
       n: "JAGD",
-      e: "Besiegte Geister kommen nicht zurück. Kleine Punkte zählen nicht.",
-      g: "Nimm einen Kraftpunkt und friss alle Geister."
+      e: "Besiegte Geister kommen nicht zurück. Ohne Kraftpunkte verlierst du.",
+      g: "Friss alle Geister mit den Kraftpunkten auf der Karte."
     },
     POWERUP_TRIAL: {
       n: "TRAINING",
@@ -2297,8 +2305,8 @@ const MODE_I18N = {
     },
     HUNT: {
       n: "狩猎",
-      e: "被消灭的幽灵不会回来。小豆子不计数。",
-      g: "吃下能量豆并吃掉所有幽灵。"
+      e: "被消灭的幽灵不会回来。如果能量豆用完，你就输了。",
+      g: "用地图上的能量豆吃掉所有幽灵。"
     },
     POWERUP_TRIAL: {
       n: "训练",
@@ -2354,8 +2362,8 @@ const MODE_I18N = {
     },
     HUNT: {
       n: "शिकार",
-      e: "खत्म किए भूत वापस नहीं आते। छोटी बिंदुएं नहीं गिनतीं।",
-      g: "पावर बिंदु लें और सभी भूत खाएं।"
+      e: "खत्म किए भूत वापस नहीं आते। पावर बिंदु खत्म हुए तो आप हार जाते हैं।",
+      g: "मानचित्र की पावर बिंदुओं से सभी भूत खाएं।"
     },
     POWERUP_TRIAL: {
       n: "प्रशिक्षण",
@@ -2411,8 +2419,8 @@ const MODE_I18N = {
     },
     HUNT: {
       n: "صيد",
-      e: "الأشباح المقضي عليها لا تعود. النقاط الصغيرة لا تُحسب.",
-      g: "خذ كرة قوة وكل كل الأشباح."
+      e: "الأشباح المقضي عليها لا تعود. إذا نفدت كرات القوة، تخسر.",
+      g: "كل كل الأشباح باستخدام كرات القوة في الخريطة."
     },
     POWERUP_TRIAL: {
       n: "تدريب",
@@ -3334,6 +3342,7 @@ function getAdvLevelConfig(n) {
   const mazeH = Math.min(11 + (world - 1), 19);
   const loopPct = Math.max(.18, .4 - world * .02);
   const powerups = advPowerupsForWorld(world);
+  const dotTarget = Math.round(25 + (n - 1) / 99 * 65);
   const newPowerup = world >= 2 ? ADV_POWERUP_UNLOCKS[world - 2] : null;
   let mode, modeCfg = {};
   switch (pos) {
@@ -3363,6 +3372,9 @@ function getAdvLevelConfig(n) {
 
    case 5:
     mode = !newPowerup ? "TIMETRIAL" : "BLACKOUT";
+    modeCfg = !newPowerup ? {
+      baseTime: Math.max(35, 70 - world * 3)
+    } : {};
     break;
 
    case 6:
@@ -3409,7 +3421,8 @@ function getAdvLevelConfig(n) {
     mazeW: mazeW,
     mazeH: mazeH,
     loopPct: loopPct,
-    powerups: powerups
+    powerups: powerups,
+    dotTarget: dotTarget
   };
 }
 
@@ -5091,6 +5104,9 @@ class Game {
     };
     const st = this.adventure.state;
     const mode = cfg.mode;
+    // Total de bolas al empezar y cuántas hacen falta según el % del nivel.
+    st.dotsAtStart = this.totalDots;
+    st.dotsNeeded = Math.max(1, Math.ceil(this.totalDots * (cfg.dotTarget || 100) / 100));
     this.ghosts = this.ghosts.slice(0, cfg.numGhosts);
     this.setGhostRevive(cfg.ghostRevive || 4);
     this.stars = this.stars.filter(s => this.ghosts.includes(s.target));
@@ -5101,47 +5117,8 @@ class Game {
     }
     if (mode === "HUNT") {
       st.ghostsLeft = this.ghosts.length;
-      st.huntPelletCells = [];
-      let extra = 8;
-      for (let y = 2; y < GRID_H - 2 && extra > 0; y += 3) {
-        for (let x = 2; x < GRID_W - 2 && extra > 0; x += 4) {
-          let cell = null;
-          if (this.maze.grid[y][x] === 0) {
-            cell = {
-              x: x,
-              y: y
-            };
-          } else {
-            outer: for (let r = 1; r < 4; r++) {
-              for (let dy = -r; dy <= r; dy++) {
-                for (let dx = -r; dx <= r; dx++) {
-                  const nx = x + dx, ny = y + dy;
-                  if (nx > 0 && nx < GRID_W - 1 && ny > 0 && ny < GRID_H - 1 && this.maze.grid[ny][nx] === 0) {
-                    cell = {
-                      x: nx,
-                      y: ny
-                    };
-                    break outer;
-                  }
-                }
-              }
-            }
-          }
-          if (!cell) continue;
-          const idx = cell.y * GRID_W + cell.x;
-          if (st.huntPelletCells.includes(idx)) continue;
-          if (this.dots[idx]) {
-            this.dots[idx] = 0;
-            this.totalDots--;
-          }
-          this.pellets[idx] = 1;
-          st.huntPelletCells.push(idx);
-          extra--;
-        }
-      }
-      st.huntPelletRespawnT = 6;
     }
-    if (mode === "TIMETRIAL") st.timer = cfg.modeCfg.baseTime;
+    if (mode === "TIMETRIAL") st.timer = cfg.modeCfg.baseTime || 60;
     if (mode === "INVISIBLE") this.stars = [];
     if (mode === "HORDE") {
       st.timer = cfg.modeCfg.survive;
@@ -5465,25 +5442,26 @@ class Game {
         if (alive === 0) st.result = "win"; else if (this.totalDots === 0) st.result = "lose";
       }
       if (mode === "HUNT") {
-        st.huntPelletRespawnT -= dt;
-        if (st.huntPelletRespawnT <= 0) {
-          st.huntPelletRespawnT = 6;
-          for (const idx of st.huntPelletCells) {
-            const px = idx % GRID_W, py = idx / GRID_W | 0;
-            const occupied = [ this.host, ...this.ghosts ].some(e => Math.abs(e.x - px) < .6 && Math.abs(e.y - py) < .6);
-            if (!occupied) this.pellets[idx] = 1;
-          }
-        }
         const before = this.ghosts.length;
         this.ghosts = this.ghosts.filter(g => !g.eaten);
         if (this.ghosts.length < before) {
           this.stars = this.stars.filter(s => this.ghosts.includes(s.target));
         }
         st.ghostsLeft = this.ghosts.length;
-        if (st.ghostsLeft === 0) st.result = "win";
+        if (st.ghostsLeft === 0) {
+          st.result = "win";
+        } else {
+          // Derrota: ya no quedan bolas de poder en el mapa Y ningún fantasma
+          // sigue asustado (no hay forma de comerse a los que quedan).
+          let pelletsLeft = 0;
+          for (let i = 0; i < this.pellets.length; i++) if (this.pellets[i]) pelletsLeft++;
+          const anyFrightened = this.ghosts.some(g => g.frightTimer > 0);
+          if (pelletsLeft === 0 && !anyFrightened) st.result = "lose";
+        }
       }
       if ([ "CLASSIC", "INVISIBLE", "BLACKOUT", "TIMETRIAL", "DYNAMIC_WALLS", "PORTALS" ].includes(mode)) {
-        if (this.totalDots === 0) st.result = "win";
+        const eaten = st.dotsAtStart - this.totalDots;
+        if (eaten >= st.dotsNeeded) st.result = "win";
       }
       if (mode === "POWERUP_TRIAL") {
         if (st.trialUses >= adv.config.modeCfg.uses) st.result = "win";
@@ -7349,17 +7327,18 @@ class Game {
       ctx.fillStyle = halo;
       ctx.fillRect(px - CELL * 2, py - CELL * 2, CELL * 4, CELL * 4);
     }
-    ctx.font = '9px "Press Start 2P", monospace';
+    ctx.font = '12px "Press Start 2P", monospace';
     ctx.textAlign = "center";
     ctx.fillStyle = "#3bff9d";
     let hudText = "";
+    const dotsEaten = st.dotsAtStart != null ? st.dotsAtStart - this.totalDots : 0;
     switch (mode) {
      case "CLASSIC":
      case "INVISIBLE":
      case "BLACKOUT":
      case "DYNAMIC_WALLS":
      case "PORTALS":
-      hudText = "BOLAS: " + this.totalDots;
+      hudText = "BOLAS: " + dotsEaten + "/" + st.dotsNeeded;
       break;
 
      case "HUNT":
@@ -7367,7 +7346,7 @@ class Game {
       break;
 
      case "TIMETRIAL":
-      hudText = "TIEMPO: " + Math.max(0, st.timer).toFixed(1) + "s · BOLAS: " + this.totalDots;
+      hudText = Math.max(0, st.timer).toFixed(1) + "s · BOLAS: " + dotsEaten + "/" + st.dotsNeeded;
       ctx.fillStyle = st.timer < 10 ? "#ff4040" : "#3bff9d";
       break;
 
@@ -7380,7 +7359,7 @@ class Game {
       break;
 
      case "GHOST_MODE":
-      hudText = "PACS: " + st.cpuPacs.filter(p => p.lives > 0).length + " · BOLAS: " + this.totalDots;
+      hudText = "PACS: " + st.cpuPacs.filter(p => p.lives > 0).length;
       break;
 
      case "BOSS":
@@ -7390,7 +7369,7 @@ class Game {
     if (hudText) {
       ctx.shadowColor = "#000";
       ctx.shadowBlur = 6;
-      ctx.fillText(hudText, CANVAS_W / 2, 30);
+      ctx.fillText(hudText, CANVAS_W / 2, 32);
       ctx.shadowBlur = 0;
     }
   }
@@ -8489,6 +8468,9 @@ function showAdvMissionBriefing(n) {
   const section = (label, text, color) => `\n    <div style="margin: 14px auto 0; max-width: 440px; text-align: left;\n                background: rgba(255,255,255,0.04); border-left: 3px solid ${color};\n                border-radius: 6px; padding: 10px 14px;">\n      <div style="font-family:'Press Start 2P',monospace; font-size: 8px; color: ${color}; margin-bottom: 6px; letter-spacing: 1px;">${label}</div>\n      <div style="font-size: 15px; color: #f0e9ff; line-height: 1.4;">${text}</div>\n    </div>`;
   let goalText = mi.g;
   if (cfg.mode === "POWERUP_TRIAL") goalText = t("use_power_times", cfg.modeCfg.uses);
+  if ([ "CLASSIC", "INVISIBLE", "BLACKOUT", "TIMETRIAL", "DYNAMIC_WALLS", "PORTALS" ].includes(cfg.mode)) {
+    goalText = t("eat_pct", cfg.dotTarget);
+  }
   const box = document.getElementById("adv-grid");
   box.innerHTML = `\n    <div style="text-align:center; padding: 12px 8px;">\n      <div style="font-family:'Press Start 2P',monospace; font-size:10px; color:var(--muted);">${t("level")} ${n} · ${t("world")} ${cfg.world}</div>\n      <div style="font-family:'Press Start 2P',monospace; font-size:18px; color:var(--cyan); margin:14px 0 4px;">${mi.n}</div>\n      ${extra}\n      ${section(t("effect_title"), mi.e, "#bb66ff")}\n      ${section(t("goal_title"), goalText, "#3bff9d")}\n      <div style="margin-top:22px;">\n        <button class="btn yellow" id="btn-adv-play">${t("play")}</button>\n        <button class="btn" id="btn-adv-cancel" style="margin-left:8px;">${t("back")}</button>\n      </div>\n    </div>`;
   document.getElementById("btn-adv-play").addEventListener("click", () => startAdventureLevel(n));
