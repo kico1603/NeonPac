@@ -881,7 +881,7 @@ const firebaseConfig = {
       </div>
       <div class="error" id="menu-error"></div>
       <button class="btn" id="btn-manual" style="border-color:#ffd400; color:#ffd400; margin-top: 6px;" data-i18n="manual">📖 Manual</button>
-      <button class="btn" id="btn-options" style="border-color: var(--muted); color: var(--muted); margin-top: 6px;" data-i18n="options">⚙ Opciones</button>
+      <button class="btn" id="btn-options" style="border-color:#bb66ff; color:#bb66ff; box-shadow: inset 0 0 8px rgba(187,102,255,0.2), 0 0 8px rgba(187,102,255,0.3); margin-top: 6px;" data-i18n="options">⚙ Opciones</button>
       <button class="btn" id="btn-support" style="border-color:#ff5e5b; color:#ff5e5b; box-shadow: inset 0 0 8px rgba(255,94,91,0.2), 0 0 8px rgba(255,94,91,0.3); margin-top: 6px;" data-i18n="support">❤ Apoyar al creador</button>
     </div>
 
@@ -890,7 +890,7 @@ const firebaseConfig = {
       <span data-i18n="hint_tail">· Come puntos · Esquiva los 6 fantasmas</span>
     </div>
     <div style="position: fixed; bottom: 8px; right: 12px; font-size: 13px; color: var(--muted); font-family: 'Press Start 2P', monospace; letter-spacing: 1px;">
-      v1.3
+      v1.4.1
     </div>
   </section>
 
@@ -3345,9 +3345,14 @@ function getAdvLevelConfig(n) {
   const mazeW = Math.min(13 + (world - 1), 22);
   const mazeH = Math.min(11 + (world - 1), 19);
   const loopPct = Math.max(.18, .4 - world * .02);
-  const powerups = advPowerupsForWorld(world);
+  // Power-ups disponibles: los de mundos anteriores siempre; el power-up NUEVO de
+  // este mundo solo a partir de su nivel de estreno (pos 2), no en el nivel 1 (pos 1).
+  let powerups = advPowerupsForWorld(world);
+  if (pos === 1 && world >= 2) {
+    // En el primer nivel del mundo aún no se ha presentado el power-up nuevo: quitarlo.
+    powerups = powerups.slice(0, world - 2);
+  }
   const dotTarget = Math.round(25 + (n - 1) / 99 * 65);
-  // Objetivo en número absoluto: % del promedio de bolas del mundo, redondeado a 5.
   const dotGoal = Math.max(5, Math.round(ADV_AVG_DOTS[world] * dotTarget / 100 / 5) * 5);
   const newPowerup = world >= 2 ? ADV_POWERUP_UNLOCKS[world - 2] : null;
   let mode, modeCfg = {};
@@ -5130,6 +5135,11 @@ class Game {
     if (mode === "HORDE") {
       st.timer = cfg.modeCfg.survive;
       this.ghosts = this.ghosts.slice(0, 2);
+      st.hordeNextSpawn = 7;
+      // En HORDA no hay bolas de poder (no se trata de comer fantasmas, sino de sobrevivir).
+      for (let i = 0; i < this.pellets.length; i++) {
+        if (this.pellets[i]) this.pellets[i] = 0;
+      }
     }
     if (mode === "DYNAMIC_WALLS") {
       let count = 0;
@@ -5147,20 +5157,36 @@ class Game {
       }
     }
     if (mode === "PORTALS") {
-      const cells = [];
-      for (let y = 2; y < GRID_H - 2; y += 4) {
-        for (let x = 2; x < GRID_W - 2; x += 6) {
-          if (this.maze.grid[y][x] === 0) cells.push({
-            x: x,
-            y: y
-          });
+      // Recolectar TODAS las celdas de pasillo y repartir 6 portales bien separados.
+      const floor = [];
+      for (let y = 1; y < GRID_H - 1; y++) {
+        for (let x = 1; x < GRID_W - 1; x++) {
+          if (this.maze.grid[y][x] === 0) floor.push({ x: x, y: y });
         }
       }
-      for (let i = 0; i < 6 && i < cells.length; i++) {
-        const c = cells[Math.floor(i * cells.length / 6)];
+      // Mezclar (determinista con el seed del mapa no hace falta; basta variedad)
+      for (let i = floor.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [ floor[i], floor[j] ] = [ floor[j], floor[i] ];
+      }
+      const chosen = [];
+      const minDist = 3;
+      for (const cell of floor) {
+        if (chosen.length >= 6) break;
+        // Mantener separación mínima entre portales para que no se solapen
+        if (chosen.every(c => Math.abs(c.x - cell.x) + Math.abs(c.y - cell.y) >= minDist)) {
+          chosen.push(cell);
+        }
+      }
+      // Si no hubo suficientes con separación, rellenar con lo que haya
+      for (const cell of floor) {
+        if (chosen.length >= 6) break;
+        if (!chosen.includes(cell)) chosen.push(cell);
+      }
+      for (let i = 0; i < chosen.length; i++) {
         st.portals.push({
-          x: c.x,
-          y: c.y,
+          x: chosen[i].x,
+          y: chosen[i].y,
           pair: Math.floor(i / 2),
           hue: i % 3
         });
@@ -5211,8 +5237,11 @@ class Game {
       for (const g of this.ghosts) g.update(this.maze.grid, sdt, [ this.host, this.guest ]);
     }
     this.elapsedTime += dt;
+    const ghostModeNow = this.adventure && this.adventure.config.mode === "GHOST_MODE";
     for (const p of [ this.host, this.guest ]) {
       if (p.respawnTimer > 0) continue;
+      // En "Eres el fantasma" el jugador (host) es el cazador: NO come bolas.
+      if (ghostModeNow && p === this.host) continue;
       const cx = Math.round(p.x), cy = Math.round(p.y);
       const idx = cy * GRID_W + cx;
       if (idx < 0 || idx >= this.dots.length) continue;
@@ -5224,7 +5253,7 @@ class Game {
         if (p === this.local) this.sfx.chomp();
         this.spawnPopup(cx, cy, "+10", p.color);
         if (this.adventure && this.adventure.config.mode === "TIMETRIAL" && p === this.host) {
-          this.adventure.state.timer += .5;
+          this.adventure.state.timer += .1;
         }
       }
       if (this.pellets[idx]) {
@@ -5366,7 +5395,7 @@ class Game {
         st.timer -= dt;
         st.hordeNextSpawn -= dt;
         if (st.hordeNextSpawn <= 0 && this.ghosts.length < 10) {
-          st.hordeNextSpawn = 15;
+          st.hordeNextSpawn = 6;
           const gs = this.maze.ghostSpawn;
           const personalities = [ "blinky", "pinky", "inky", "clyde" ];
           const idx = this.ghosts.length;
@@ -6051,6 +6080,23 @@ class Game {
       bot.nextDir = {
         ...chosenDir
       };
+    } else {
+      // No encontró objetivo: NUNCA quedarse quieto. Elegir una dirección válida,
+      // evitando la marcha atrás y las casillas peligrosas si se puede.
+      const valid = DIRS4.filter(d => {
+        const nx = cx + d.x, ny = cy + d.y;
+        return nx >= 0 && nx < GRID_W && ny >= 0 && ny < GRID_H && this.maze.grid[ny][nx] === 0;
+      });
+      if (valid.length) {
+        const back = { x: -bot.dir.x, y: -bot.dir.y };
+        const noBack = valid.filter(d => !(d.x === back.x && d.y === back.y));
+        const pool = noBack.length ? noBack : valid;
+        // Preferir la menos peligrosa
+        pool.sort((a, b) => evalDir(a) - evalDir(b));
+        const pick = pool[0];
+        bot.dir = { ...pick };
+        bot.nextDir = { ...pick };
+      }
     }
     if (bot.powerUp && this.botConfig.powerups) {
       const kind = POWERUPS[bot.powerUp.type].kind;
