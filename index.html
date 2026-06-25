@@ -814,6 +814,55 @@
     border-radius: 8px; cursor: pointer; -webkit-tap-highlight-color: transparent;
   }
 
+
+  /* ===== Partida personalizada ===== */
+  .custom-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(4, 2, 14, 0.94); backdrop-filter: blur(5px);
+    display: none; align-items: flex-start; justify-content: center;
+    padding: 20px; overflow-y: auto;
+  }
+  .custom-overlay.active { display: flex; }
+  .custom-panel {
+    background: #0a0520; border: 2px solid var(--magenta);
+    box-shadow: 0 0 40px rgba(255,43,214,0.35);
+    border-radius: 14px; padding: 22px; width: min(540px, 94vw); margin: auto;
+  }
+  .custom-panel h2 {
+    font-family: 'Press Start 2P', monospace; font-size: 15px; color: var(--magenta);
+    margin: 0 0 18px; text-align: center; text-shadow: 0 0 12px rgba(255,43,214,0.5);
+  }
+  .custom-sec { margin-bottom: 18px; }
+  .custom-sec-title {
+    font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--cyan);
+    margin-bottom: 8px; letter-spacing: 1px;
+  }
+  .custom-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-family: 'Press Start 2P', monospace; font-size: 8px;
+    padding: 8px 10px; border-radius: 6px; cursor: pointer;
+    background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.2);
+    color: var(--text); -webkit-tap-highlight-color: transparent; line-height: 1.4;
+  }
+  .chip.sel { color: var(--cyan); border-color: var(--cyan); background: rgba(0,246,255,0.14); box-shadow: 0 0 8px rgba(0,246,255,0.3); }
+  .chip.locked { color: #5a5470; border-color: rgba(90,84,112,0.4); background: rgba(255,255,255,0.02); cursor: help; }
+  .chip.locked:hover { border-color: #7a7490; }
+  .custom-hint {
+    margin-top: 6px; min-height: 16px; font-size: 12px; color: #ffb14e; text-align: center;
+  }
+  .custom-actions { display: flex; gap: 10px; margin-top: 10px; }
+  .custom-play {
+    flex: 1; padding: 14px; font-family: 'Press Start 2P', monospace; font-size: 12px;
+    color: #05000f; background: var(--magenta); border: none; border-radius: 8px; cursor: pointer;
+    box-shadow: 0 0 18px rgba(255,43,214,0.5); -webkit-tap-highlight-color: transparent;
+  }
+  .custom-play:active { transform: scale(0.98); }
+  .custom-close {
+    padding: 14px 18px; font-family: 'Press Start 2P', monospace; font-size: 10px;
+    color: var(--muted); background: transparent; border: 1.5px solid var(--muted);
+    border-radius: 8px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+
 </style>
 </head>
 <body>
@@ -872,8 +921,7 @@ const firebaseConfig = {
 
     <div class="card">
       <button class="btn" id="btn-adventure" style="border-color:#3bff9d; color:#3bff9d; box-shadow: inset 0 0 8px rgba(59,255,157,0.25), 0 0 8px rgba(59,255,157,0.3);" data-i18n="adventure">Aventura</button>
-      <button class="btn magenta" id="btn-solo" data-i18n="solo">1 Jugador</button>
-      <div id="solo-difficulty" style="display:none; margin: 4px 0 8px 0;"></div>
+      <button class="btn magenta" id="btn-solo" data-i18n="solo">Partida personalizada</button>
       <button class="btn yellow" id="btn-create" data-i18n="create">Crear sala</button>
       <div class="row">
         <input class="code-input" id="join-code" maxlength="4" placeholder="CÓDIGO" data-i18n-ph="code_ph" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" inputmode="text">
@@ -890,7 +938,7 @@ const firebaseConfig = {
       <span data-i18n="hint_tail">· Come puntos · Esquiva los 6 fantasmas</span>
     </div>
     <div style="position: fixed; bottom: 8px; right: 12px; font-size: 13px; color: var(--muted); font-family: 'Press Start 2P', monospace; letter-spacing: 1px;">
-      v1.6
+      v1.7
     </div>
   </section>
 
@@ -1063,6 +1111,34 @@ const firebaseConfig = {
     </div>
   </div>
 
+  <!-- ====================== PARTIDA PERSONALIZADA ====================== -->
+  <div class="custom-overlay" id="custom-overlay">
+    <div class="custom-panel">
+      <h2 data-i18n="custom_title">PARTIDA PERSONALIZADA</h2>
+      <div class="custom-sec">
+        <div class="custom-sec-title" data-i18n="custom_mode">Modo</div>
+        <div class="custom-grid" id="custom-modes"></div>
+      </div>
+      <div class="custom-sec">
+        <div class="custom-sec-title" data-i18n="custom_diff">Dificultad</div>
+        <div class="custom-grid" id="custom-diffs"></div>
+      </div>
+      <div class="custom-sec">
+        <div class="custom-sec-title" data-i18n="custom_powerups">Power-ups</div>
+        <div class="custom-grid" id="custom-powerups"></div>
+      </div>
+      <div class="custom-sec">
+        <div class="custom-sec-title" data-i18n="custom_size">Tamaño de mapa</div>
+        <div class="custom-grid" id="custom-sizes"></div>
+      </div>
+      <div class="custom-hint" id="custom-hint"></div>
+      <div class="custom-actions">
+        <button class="custom-play" id="custom-play" data-i18n="custom_start">JUGAR</button>
+        <button class="custom-close" id="custom-close" data-i18n="opt_close">CERRAR</button>
+      </div>
+    </div>
+  </div>
+
 <script>
 "use strict";
 
@@ -1100,7 +1176,7 @@ const I18N = {
   en: {
     subtitle: "CO-OP · COMPETITIVE · 2 PLAYERS",
     adventure: "Adventure",
-    solo: "1 Player",
+    solo: "Custom game",
     create: "Create room",
     join: "Join",
     manual: "📖 Manual",
@@ -1206,6 +1282,7 @@ const I18N = {
     world: "WORLD",
     use_power_times: n => `Use the power-up successfully ${n} times.`,
     eat_dots: d => `Eat at least ${d} dots.`,
+    custom_title: "CUSTOM GAME", custom_mode: "Mode", custom_powerups: "Power-ups", custom_diff: "Difficulty", custom_size: "Map size", custom_start: "PLAY", custom_locked: "🔒 Locked", unlock_world: w => `Clear World ${w} in Adventure to unlock`, unlock_level: n => `Clear level ${n} in Adventure to unlock`, custom_none: "None", cm_CPU: "Vs CPU", cm_CLASSIC: "Classic", cm_HUNT: "Hunt", cm_INVISIBLE: "Invisible", cm_BLACKOUT: "Blackout", cm_TIMETRIAL: "Time Trial", cm_DYNAMIC_WALLS: "Moving Walls", cm_PORTALS: "Portals", cm_HORDE: "Horde", cm_GHOST_MODE: "Be the Ghost",
     pad_connected: "🎮 Gamepad connected",
     inverted: "CONTROLS INVERTED",
     adv_title: "ADVENTURE MODE",
@@ -1214,7 +1291,7 @@ const I18N = {
   es: {
     subtitle: "COOPERATIVO · COMPETITIVO · 2 JUGADORES",
     adventure: "Aventura",
-    solo: "1 Jugador",
+    solo: "Partida personalizada",
     create: "Crear sala",
     join: "Unirse",
     manual: "📖 Manual",
@@ -1320,6 +1397,7 @@ const I18N = {
     world: "MUNDO",
     use_power_times: n => `Usa el power-up con éxito ${n} veces.`,
     eat_dots: d => `Cómete al menos ${d} bolas.`,
+    custom_title: "PARTIDA PERSONALIZADA", custom_mode: "Modo", custom_powerups: "Power-ups", custom_diff: "Dificultad", custom_size: "Tamaño de mapa", custom_start: "JUGAR", custom_locked: "🔒 Bloqueado", unlock_world: w => `Supera el Mundo ${w} en Aventura para desbloquear`, unlock_level: n => `Supera el nivel ${n} en Aventura para desbloquear`, custom_none: "Ninguno", cm_CPU: "Contra CPU", cm_CLASSIC: "Clásico", cm_HUNT: "Caza", cm_INVISIBLE: "Invisibles", cm_BLACKOUT: "Apagón", cm_TIMETRIAL: "Contrarreloj", cm_DYNAMIC_WALLS: "Muros móviles", cm_PORTALS: "Portales", cm_HORDE: "Horda", cm_GHOST_MODE: "Eres el fantasma",
     pad_connected: "🎮 Mando conectado",
     inverted: "CONTROLES INVERTIDOS",
     adv_title: "MODO AVENTURA",
@@ -1328,7 +1406,7 @@ const I18N = {
   fr: {
     subtitle: "COOP · COMPÉTITIF · 2 JOUEURS",
     adventure: "Aventure",
-    solo: "1 Joueur",
+    solo: "Partie personnalisée",
     create: "Créer salon",
     join: "Rejoindre",
     manual: "📖 Manuel",
@@ -1434,6 +1512,7 @@ const I18N = {
     world: "MONDE",
     use_power_times: n => `Utilise le power-up avec succès ${n} fois.`,
     eat_dots: d => `Mange au moins ${d} points.`,
+    custom_title: "PARTIE PERSONNALISÉE", custom_mode: "Mode", custom_powerups: "Power-ups", custom_diff: "Difficulté", custom_size: "Taille du labyrinthe", custom_start: "JOUER", custom_locked: "🔒 Verrouillé", unlock_world: w => `Termine le Monde ${w} en Aventure pour débloquer`, unlock_level: n => `Termine le niveau ${n} en Aventure pour débloquer`, custom_none: "Aucun", cm_CPU: "Contre CPU", cm_CLASSIC: "Classique", cm_HUNT: "Chasse", cm_INVISIBLE: "Invisibles", cm_BLACKOUT: "Panne", cm_TIMETRIAL: "Contre-la-montre", cm_DYNAMIC_WALLS: "Murs mobiles", cm_PORTALS: "Portails", cm_HORDE: "Horde", cm_GHOST_MODE: "Sois le fantôme",
     pad_connected: "🎮 Manette connectée",
     inverted: "CONTRÔLES INVERSÉS",
     adv_title: "MODE AVENTURE",
@@ -1442,7 +1521,7 @@ const I18N = {
   pt: {
     subtitle: "COOP · COMPETITIVO · 2 JOGADORES",
     adventure: "Aventura",
-    solo: "1 Jogador",
+    solo: "Partida personalizada",
     create: "Criar sala",
     join: "Entrar",
     manual: "📖 Manual",
@@ -1548,6 +1627,7 @@ const I18N = {
     world: "MUNDO",
     use_power_times: n => `Use o power-up com sucesso ${n} vezes.`,
     eat_dots: d => `Coma pelo menos ${d} bolas.`,
+    custom_title: "PARTIDA PERSONALIZADA", custom_mode: "Modo", custom_powerups: "Power-ups", custom_diff: "Dificuldade", custom_size: "Tamanho do mapa", custom_start: "JOGAR", custom_locked: "🔒 Bloqueado", unlock_world: w => `Complete o Mundo ${w} na Aventura para desbloquear`, unlock_level: n => `Complete o nível ${n} na Aventura para desbloquear`, custom_none: "Nenhum", cm_CPU: "Contra CPU", cm_CLASSIC: "Clássico", cm_HUNT: "Caça", cm_INVISIBLE: "Invisíveis", cm_BLACKOUT: "Apagão", cm_TIMETRIAL: "Contra o tempo", cm_DYNAMIC_WALLS: "Muros móveis", cm_PORTALS: "Portais", cm_HORDE: "Horda", cm_GHOST_MODE: "Seja o fantasma",
     pad_connected: "🎮 Controle conectado",
     inverted: "CONTROLES INVERTIDOS",
     adv_title: "MODO AVENTURA",
@@ -1556,7 +1636,7 @@ const I18N = {
   de: {
     subtitle: "CO-OP · KOMPETITIV · 2 SPIELER",
     adventure: "Abenteuer",
-    solo: "1 Spieler",
+    solo: "Eigenes Spiel",
     create: "Raum erstellen",
     join: "Beitreten",
     manual: "📖 Anleitung",
@@ -1662,6 +1742,7 @@ const I18N = {
     world: "WELT",
     use_power_times: n => `Nutze das Power-up ${n} Mal erfolgreich.`,
     eat_dots: d => `Friss mindestens ${d} Punkte.`,
+    custom_title: "EIGENES SPIEL", custom_mode: "Modus", custom_powerups: "Power-ups", custom_diff: "Schwierigkeit", custom_size: "Kartengröße", custom_start: "SPIELEN", custom_locked: "🔒 Gesperrt", unlock_world: w => `Schließe Welt ${w} im Abenteuer ab zum Freischalten`, unlock_level: n => `Schließe Level ${n} im Abenteuer ab zum Freischalten`, custom_none: "Keine", cm_CPU: "Gegen CPU", cm_CLASSIC: "Klassisch", cm_HUNT: "Jagd", cm_INVISIBLE: "Unsichtbar", cm_BLACKOUT: "Blackout", cm_TIMETRIAL: "Zeitrennen", cm_DYNAMIC_WALLS: "Bewegliche Wände", cm_PORTALS: "Portale", cm_HORDE: "Horde", cm_GHOST_MODE: "Sei der Geist",
     pad_connected: "🎮 Controller verbunden",
     inverted: "STEUERUNG UMGEKEHRT",
     adv_title: "ABENTEUER-MODUS",
@@ -1670,7 +1751,7 @@ const I18N = {
   zh: {
     subtitle: "合作 · 竞技 · 双人",
     adventure: "冒险模式",
-    solo: "单人",
+    solo: "自定义对战",
     create: "创建房间",
     join: "加入",
     manual: "📖 说明",
@@ -1776,6 +1857,7 @@ const I18N = {
     world: "世界",
     use_power_times: n => `成功使用道具 ${n} 次。`,
     eat_dots: d => `吃掉至少 ${d} 颗豆子。`,
+    custom_title: "自定义对战", custom_mode: "模式", custom_powerups: "道具", custom_diff: "难度", custom_size: "地图大小", custom_start: "开始", custom_locked: "🔒 已锁定", unlock_world: w => `在冒险模式通关第 ${w} 世界以解锁`, unlock_level: n => `在冒险模式通关第 ${n} 关以解锁`, custom_none: "无", cm_CPU: "对战电脑", cm_CLASSIC: "经典", cm_HUNT: "狩猎", cm_INVISIBLE: "隐形", cm_BLACKOUT: "停电", cm_TIMETRIAL: "计时赛", cm_DYNAMIC_WALLS: "移动墙", cm_PORTALS: "传送门", cm_HORDE: "兽群", cm_GHOST_MODE: "你是幽灵",
     pad_connected: "🎮 手柄已连接",
     inverted: "控制已反转",
     adv_title: "冒险模式",
@@ -1784,7 +1866,7 @@ const I18N = {
   hi: {
     subtitle: "सहयोग · प्रतिस्पर्धी · 2 खिलाड़ी",
     adventure: "एडवेंचर",
-    solo: "1 खिलाड़ी",
+    solo: "कस्टम गेम",
     create: "रूम बनाएं",
     join: "शामिल हों",
     manual: "📖 मैनुअल",
@@ -1890,6 +1972,7 @@ const I18N = {
     world: "दुनिया",
     use_power_times: n => `पावर-अप ${n} बार सफलतापूर्वक उपयोग करें।`,
     eat_dots: d => `कम से कम ${d} बिंदुएं खाएं।`,
+    custom_title: "कस्टम गेम", custom_mode: "मोड", custom_powerups: "पावर-अप", custom_diff: "कठिनाई", custom_size: "नक्शा आकार", custom_start: "खेलें", custom_locked: "🔒 लॉक", unlock_world: w => `अनलॉक के लिए एडवेंचर में दुनिया ${w} पूरी करें`, unlock_level: n => `अनलॉक के लिए एडवेंचर में स्तर ${n} पूरा करें`, custom_none: "कोई नहीं", cm_CPU: "CPU के विरुद्ध", cm_CLASSIC: "क्लासिक", cm_HUNT: "शिकार", cm_INVISIBLE: "अदृश्य", cm_BLACKOUT: "अंधेरा", cm_TIMETRIAL: "समय दौड़", cm_DYNAMIC_WALLS: "चलती दीवारें", cm_PORTALS: "पोर्टल", cm_HORDE: "भीड़", cm_GHOST_MODE: "आप भूत हैं",
     pad_connected: "🎮 गेमपैड कनेक्ट हुआ",
     inverted: "नियंत्रण उल्टे",
     adv_title: "एडवेंचर मोड",
@@ -1898,7 +1981,7 @@ const I18N = {
   ar: {
     subtitle: "تعاوني · تنافسي · لاعبان",
     adventure: "مغامرة",
-    solo: "لاعب واحد",
+    solo: "مباراة مخصصة",
     create: "إنشاء غرفة",
     join: "انضمام",
     manual: "📖 الدليل",
@@ -2004,6 +2087,7 @@ const I18N = {
     world: "العالم",
     use_power_times: n => `استخدم القوة بنجاح ${n} مرات.`,
     eat_dots: d => `كل ما لا يقل عن ${d} نقطة.`,
+    custom_title: "مباراة مخصصة", custom_mode: "النمط", custom_powerups: "القوى", custom_diff: "الصعوبة", custom_size: "حجم الخريطة", custom_start: "العب", custom_locked: "🔒 مقفل", unlock_world: w => `أكمل العالم ${w} في المغامرة لفتحه`, unlock_level: n => `أكمل المستوى ${n} في المغامرة لفتحه`, custom_none: "لا شيء", cm_CPU: "ضد الكمبيوتر", cm_CLASSIC: "كلاسيكي", cm_HUNT: "صيد", cm_INVISIBLE: "خفية", cm_BLACKOUT: "انقطاع", cm_TIMETRIAL: "سباق الزمن", cm_DYNAMIC_WALLS: "جدران متحركة", cm_PORTALS: "بوابات", cm_HORDE: "حشد", cm_GHOST_MODE: "كن الشبح",
     pad_connected: "🎮 تم توصيل وحدة التحكم",
     inverted: "التحكم معكوس",
     adv_title: "وضع المغامرة",
@@ -3446,6 +3530,102 @@ function getAdvLevelConfig(n) {
     dotGoal: dotGoal
   };
 }
+
+
+// ============================================================
+// =======  DESBLOQUEOS DE PARTIDA PERSONALIZADA  ============
+// =======  (derivados del progreso del modo Aventura)  ======
+// ============================================================
+
+// Modos seleccionables en partida personalizada. CPU y CLASSIC vienen desbloqueados.
+// El resto se desbloquea al SUPERAR el mundo donde aparece por primera vez ese modo.
+const CUSTOM_MODES = [
+  { id: "CPU",           unlockWorld: 0 },   // duelo contra la CPU (siempre)
+  { id: "CLASSIC",       unlockWorld: 0 },   // clásico en solitario (siempre)
+  { id: "HUNT",          unlockWorld: 1 },   // aparece en mundo 1 → superar mundo 1
+  { id: "INVISIBLE",     unlockWorld: 1 },
+  { id: "BLACKOUT",      unlockWorld: 1 },
+  { id: "TIMETRIAL",     unlockWorld: 1 },
+  { id: "DYNAMIC_WALLS", unlockWorld: 1 },
+  { id: "PORTALS",       unlockWorld: 1 },
+  { id: "HORDE",         unlockWorld: 1 },
+  { id: "GHOST_MODE",    unlockWorld: 1 },
+];
+
+// ¿Se ha superado (completado) el mundo w? (sus 10 niveles)
+function isWorldCleared(save, w) {
+  if (w <= 0) return true;
+  for (let n = (w - 1) * 10 + 1; n <= w * 10; n++) {
+    if (!save.completed[n]) return false;
+  }
+  return true;
+}
+
+// Nº de mundos completados de forma consecutiva desde el 1.
+function worldsCleared(save) {
+  let c = 0;
+  for (let w = 1; w <= 10; w++) {
+    if (isWorldCleared(save, w)) c = w; else break;
+  }
+  return c;
+}
+
+// ---- Modos ----
+function isModeUnlocked(save, modeId) {
+  const m = CUSTOM_MODES.find(x => x.id === modeId);
+  if (!m) return false;
+  if (m.unlockWorld === 0) return true;
+  return isWorldCleared(save, m.unlockWorld);
+}
+
+// ---- Dificultad del bot ----
+// Índice 0 (Paseo) siempre; cada índice extra requiere superar 1 mundo más.
+// Fácil(1)→mundo1, Normal(2)→mundo2, Difícil(3)→mundo3, Muy difícil(4)→mundo4, Pesadilla(5)→mundo5.
+function isDifficultyUnlocked(save, idx) {
+  if (idx <= 0) return true;
+  return isWorldCleared(save, idx);
+}
+
+// ---- Power-ups: desbloqueados al superar su nivel de entrenamiento (trial) ----
+// El power-up ADV_POWERUP_UNLOCKS[w-2] se presenta en el nivel 2 del mundo w (w>=2),
+// es decir, nivel (w-1)*10 + 2. Se desbloquea al completar ese nivel.
+function powerupTrialLevel(kind) {
+  const i = ADV_POWERUP_UNLOCKS.indexOf(kind);
+  if (i < 0) return null;
+  const world = i + 2;                // shoes→mundo2, magnet→mundo3, ...
+  return (world - 1) * 10 + 2;        // nivel del trial
+}
+function isPowerupUnlocked(save, kind) {
+  const lvl = powerupTrialLevel(kind);
+  if (lvl == null) return false;
+  return !!save.completed[lvl];
+}
+
+// ---- Tamaños de mapa: se desbloquean al superar el PRIMER nivel que usa ese tamaño ----
+// El mapa del mundo w es (13+(w-1)) x (11+(w-1)), tope 22x19. El primer nivel del mundo
+// es (w-1)*10 + 1. Construimos la lista de tamaños únicos y su nivel de desbloqueo.
+function customMapSizes() {
+  const sizes = [];
+  const seen = new Set();
+  for (let w = 1; w <= 10; w++) {
+    const mw = Math.min(13 + (w - 1), 22);
+    const mh = Math.min(11 + (w - 1), 19);
+    const key = mw + "x" + mh;
+    if (!seen.has(key)) {
+      seen.add(key);
+      sizes.push({ w: mw, h: mh, key: key, unlockLevel: (w - 1) * 10 + 1 });
+    }
+  }
+  return sizes;
+}
+function isMapSizeUnlocked(save, unlockLevel) {
+  return !!save.completed[unlockLevel];
+}
+
+// Texto de "cómo desbloquear" para mostrar al pulsar algo bloqueado.
+function unlockHintWorld(w) { return t("unlock_world", w); }
+function unlockHintLevel(n) { return t("unlock_level", n); }
+
 
 const ADV_MODE_INFO = {
   CLASSIC: {
@@ -4929,6 +5109,7 @@ class Game {
     this.local = null;
     this.soloMode = false;
     this.adventure = null;
+    this.customPowerups = null;
     this.botConfig = BOT_DIFFICULTIES[2];
     this.remote = null;
     this.input = {
@@ -5635,6 +5816,14 @@ class Game {
         return;
       }
       const kind = allowed[Math.floor(Math.random() * allowed.length)];
+      type = POWERUPS.findIndex(p => p.kind === kind);
+    } else if (this.customPowerups) {
+      // Partida personalizada (modo CPU) con power-ups elegidos: solo esos.
+      if (!this.customPowerups.length) {
+        this.powerUpNextSpawn = this.elapsedTime + 9999;
+        return;
+      }
+      const kind = this.customPowerups[Math.floor(Math.random() * this.customPowerups.length)];
       type = POWERUPS.findIndex(p => p.kind === kind);
     } else {
       do {
@@ -8677,6 +8866,7 @@ async function startAdventureLevel(n) {
   game.setLocalRole(true);
   game.soloMode = false;
   game.botConfig = BOT_DIFFICULTIES[2];
+  game.customPowerups = null;
   game.setupAdventure(cfg);
   showScreen("game");
   document.getElementById("hud-room").textContent = "N" + n;
@@ -8687,9 +8877,107 @@ async function startAdventureLevel(n) {
   });
 }
 
+async function startCustomGame() {
+  const sel = customSel;
+  const sizes = customMapSizes();
+  const size = sizes.find(s => s.key === sel.size) || sizes[0];
+  const mw = size.w, mh = size.h;
+
+  // Modo "CPU": duelo libre contra el bot (sin aventura), como el antiguo 1 jugador.
+  if (sel.mode === "CPU") {
+    setMapSize(mw, mh);
+    MAZE_LOOP_PCT = .32;
+    GHOST_SPEED = GHOST_SPEED_DEFAULT;
+    game.adventure = null;
+    const seed = Math.floor(Math.random() * 1e9);
+    game.setupMaze(seed);
+    game.setupActors();
+    game.setLocalRole(true);
+    game.soloMode = true;
+    game.botConfig = BOT_DIFFICULTIES[sel.diff] || BOT_DIFFICULTIES[2];
+    game.guest.aiSpeedFactor = game.botConfig.speed;
+    game.setGhostRevive(game.botConfig.ghostRevive || 4);
+    game.customPowerups = sel.powerups.size ? [ ...sel.powerups ] : null;
+    showScreen("game");
+    document.getElementById("hud-room").textContent = game.botConfig.name;
+    game.render();
+    await countdownThen(() => {
+      sfx.start();
+      runHostLoop();
+    });
+    return;
+  }
+
+  // Resto de modos: construir un config de aventura sintético con las opciones elegidas.
+  const cfg = {
+    level: 0,
+    world: 1,
+    mode: sel.mode,
+    modeCfg: {},
+    numGhosts: 4,
+    ghostSpeed: GHOST_SPEED_DEFAULT,
+    ghostRevive: 4,
+    mazeW: mw,
+    mazeH: mh,
+    loopPct: .32,
+    powerups: sel.powerups.size ? [ ...sel.powerups ] : [],
+    dotTarget: 100,
+    dotGoal: 0,
+    custom: true
+  };
+  // Configuración específica por modo
+  if (cfg.mode === "TIMETRIAL") cfg.modeCfg = { baseTime: 60 };
+  if (cfg.mode === "HORDE") cfg.modeCfg = { survive: 60 };
+  if (cfg.mode === "GHOST_MODE") cfg.modeCfg = { pacs: 3 };
+
+  setMapSize(mw, mh);
+  MAZE_LOOP_PCT = cfg.loopPct;
+  GHOST_SPEED = cfg.ghostSpeed;
+  const seed = Math.floor(Math.random() * 1e9);
+  game.setupMaze(seed);
+  game.setupActors();
+  game.setLocalRole(true);
+  game.soloMode = cfg.mode === "BOSS";
+  game.botConfig = BOT_DIFFICULTIES[sel.diff] || BOT_DIFFICULTIES[2];
+  game.setupAdventure(cfg);
+  // dotGoal sintético para los modos de comer bolas (un % del total real del mapa)
+  if ([ "CLASSIC", "INVISIBLE", "BLACKOUT", "TIMETRIAL", "DYNAMIC_WALLS", "PORTALS" ].includes(cfg.mode)) {
+    const target = Math.round(game.totalDots * .9);
+    game.adventure.state.dotsAtStart = game.totalDots;
+    game.adventure.state.dotsNeeded = Math.max(1, target);
+  }
+  showScreen("game");
+  document.getElementById("hud-room").textContent = t("cm_" + sel.mode);
+  game.render();
+  await countdownThen(() => {
+    sfx.start();
+    runHostLoop();
+  });
+}
+
 function onAdventureEnd() {
   const adv = game.adventure;
   const won = adv.state.result === "win";
+  // Partida personalizada: no guarda progreso ni usa los botones de aventura.
+  if (adv.config.custom) {
+    const title2 = won ? `<div class="big" style="color: var(--yellow);">${t("win")}</div>` : `<div class="big" style="color: var(--magenta);">${t("lose")}</div>`;
+    showOverlay(`\n    ${title2}\n    <div style="font-size: 18px; margin-top: 8px;">${t("points")}: ${game.host.score}</div>\n    <button class="btn cyan" id="btn-custom-again" style="margin-top:18px;">${t("custom_start")}</button>\n    <button class="btn" id="btn-custom-exit" style="margin-top:10px;">${t("back_menu")}</button>\n  `);
+    setTimeout(() => {
+      const again = document.getElementById("btn-custom-again");
+      if (again) again.addEventListener("click", () => {
+        hideOverlay();
+        resetAfterAdventure();
+        startCustomGame();
+      });
+      const exit = document.getElementById("btn-custom-exit");
+      if (exit) exit.addEventListener("click", () => {
+        hideOverlay();
+        resetAfterAdventure();
+        showScreen("menu");
+      });
+    }, 50);
+    return;
+  }
   const n = adv.config.level;
   if (won) {
     const save = advLoad();
@@ -8740,21 +9028,122 @@ document.getElementById("btn-adv-back").addEventListener("click", () => {
 
 document.getElementById("btn-solo").addEventListener("click", () => {
   initAudio();
-  const box = document.getElementById("solo-difficulty");
-  if (box.style.display !== "none") {
-    box.style.display = "none";
-    return;
+  openCustomGame();
+});
+
+// Estado de selección actual de la partida personalizada
+const customSel = { mode: "CPU", diff: 0, powerups: new Set(), size: null };
+
+function openCustomGame() {
+  const save = advLoad();
+  renderCustomGame(save);
+  document.getElementById("custom-overlay").classList.add("active");
+}
+function closeCustomGame() {
+  document.getElementById("custom-overlay").classList.remove("active");
+}
+
+function customSetHint(msg) {
+  const el = document.getElementById("custom-hint");
+  el.textContent = msg || "";
+}
+
+function renderCustomGame(save) {
+  // --- Modos ---
+  const modesBox = document.getElementById("custom-modes");
+  modesBox.innerHTML = "";
+  for (const m of CUSTOM_MODES) {
+    const unlocked = isModeUnlocked(save, m.id);
+    const chip = document.createElement("button");
+    chip.className = "chip" + (unlocked ? (customSel.mode === m.id ? " sel" : "") : " locked");
+    chip.textContent = t("cm_" + m.id);
+    if (unlocked) {
+      chip.addEventListener("click", () => {
+        customSel.mode = m.id;
+        customSetHint("");
+        renderCustomGame(save);
+      });
+    } else {
+      chip.addEventListener("click", () => customSetHint(unlockHintWorld(m.unlockWorld)));
+    }
+    modesBox.appendChild(chip);
   }
-  box.innerHTML = BOT_DIFFICULTIES.map((d, i) => `<button class="btn" style="border-color:${d.color}; color:${d.color}; display:block; width:100%; margin:6px 0; font-size:11px;" data-diff="${i}">${d.name}</button>`).join("");
-  box.style.display = "block";
-  box.querySelectorAll("[data-diff]").forEach(b => {
-    b.addEventListener("click", e => {
-      e.stopPropagation();
-      const idx = parseInt(b.getAttribute("data-diff"), 10);
-      box.style.display = "none";
-      startGameAsSolo(idx);
-    });
+
+  // --- Dificultad (solo relevante para el modo CPU, pero se muestra siempre) ---
+  const diffsBox = document.getElementById("custom-diffs");
+  diffsBox.innerHTML = "";
+  BOT_DIFFICULTIES.forEach((d, i) => {
+    const unlocked = isDifficultyUnlocked(save, i);
+    const chip = document.createElement("button");
+    chip.className = "chip" + (unlocked ? (customSel.diff === i ? " sel" : "") : " locked");
+    chip.textContent = d.name;
+    if (unlocked) {
+      chip.addEventListener("click", () => {
+        customSel.diff = i;
+        customSetHint("");
+        renderCustomGame(save);
+      });
+    } else {
+      chip.addEventListener("click", () => customSetHint(unlockHintWorld(i)));
+    }
+    diffsBox.appendChild(chip);
   });
+
+  // --- Power-ups (multi-selección) ---
+  const puBox = document.getElementById("custom-powerups");
+  puBox.innerHTML = "";
+  for (const kind of ADV_POWERUP_UNLOCKS) {
+    const unlocked = isPowerupUnlocked(save, kind);
+    const chip = document.createElement("button");
+    chip.className = "chip" + (unlocked ? (customSel.powerups.has(kind) ? " sel" : "") : " locked");
+    chip.textContent = puName(kind);
+    if (unlocked) {
+      chip.addEventListener("click", () => {
+        if (customSel.powerups.has(kind)) customSel.powerups.delete(kind); else customSel.powerups.add(kind);
+        customSetHint("");
+        renderCustomGame(save);
+      });
+    } else {
+      const lvl = powerupTrialLevel(kind);
+      chip.addEventListener("click", () => customSetHint(unlockHintLevel(lvl)));
+    }
+    puBox.appendChild(chip);
+  }
+
+  // --- Tamaños de mapa ---
+  const sizesBox = document.getElementById("custom-sizes");
+  sizesBox.innerHTML = "";
+  const sizes = customMapSizes();
+  // Selección por defecto: el primer tamaño desbloqueado
+  if (customSel.size === null) {
+    const firstUnlocked = sizes.find(s => isMapSizeUnlocked(save, s.unlockLevel));
+    customSel.size = firstUnlocked ? firstUnlocked.key : sizes[0].key;
+  }
+  for (const s of sizes) {
+    const unlocked = isMapSizeUnlocked(save, s.unlockLevel);
+    const chip = document.createElement("button");
+    chip.className = "chip" + (unlocked ? (customSel.size === s.key ? " sel" : "") : " locked");
+    chip.textContent = s.key;
+    if (unlocked) {
+      chip.addEventListener("click", () => {
+        customSel.size = s.key;
+        customSetHint("");
+        renderCustomGame(save);
+      });
+    } else {
+      chip.addEventListener("click", () => customSetHint(unlockHintLevel(s.unlockLevel)));
+    }
+    sizesBox.appendChild(chip);
+  }
+}
+
+document.getElementById("custom-close").addEventListener("click", closeCustomGame);
+document.getElementById("custom-overlay").addEventListener("click", e => {
+  if (e.target.id === "custom-overlay") closeCustomGame();
+});
+document.getElementById("custom-play").addEventListener("click", () => {
+  closeCustomGame();
+  startCustomGame();
 });
 
 async function startGameAsSolo(diffIndex) {
