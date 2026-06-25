@@ -890,7 +890,7 @@ const firebaseConfig = {
       <span data-i18n="hint_tail">· Come puntos · Esquiva los 6 fantasmas</span>
     </div>
     <div style="position: fixed; bottom: 8px; right: 12px; font-size: 13px; color: var(--muted); font-family: 'Press Start 2P', monospace; letter-spacing: 1px;">
-      v1.4.1
+      v1.5
     </div>
   </section>
 
@@ -5358,6 +5358,8 @@ class Game {
         let bestP = null, bestD = Infinity;
         for (const p of [ this.host, this.guest ]) {
           if (p.respawnTimer > 0 || p.lives <= 0) continue;
+          // En "Eres el fantasma" el host es el cazador: no recoge power-ups (son para los pacs).
+          if (this.adventure && this.adventure.config.mode === "GHOST_MODE" && p === this.host) continue;
           if (Math.round(p.x) === this.powerUp.cellX && Math.round(p.y) === this.powerUp.cellY) {
             const d = Math.hypot(p.x - this.powerUp.cellX, p.y - this.powerUp.cellY);
             if (d < bestD) {
@@ -5466,6 +5468,17 @@ class Game {
             this.totalDots--;
             pac.chompTimer = .18;
           }
+          // Recoger el power-up del mapa si lo pisan
+          if (this.powerUp && Math.round(this.powerUp.cellX) === cx && Math.round(this.powerUp.cellY) === cy) {
+            pac.powerUp = { type: this.powerUp.type };
+            const label = POWERUPS[this.powerUp.type].name.toUpperCase();
+            this.spawnPopup(cx, cy, label, POWERUPS[this.powerUp.type].color);
+            this.spawnParticles(cx, cy, POWERUPS[this.powerUp.type].color, 14);
+            this.powerUp = null;
+            this.powerUpNextSpawn = this.elapsedTime + POWERUP_AFTER_PICKUP;
+          }
+          // Usar el power-up contra el jugador-fantasma
+          if (pac.powerUp) this._pacUsePowerUp(pac);
           if (Math.hypot(this.host.x - pac.x, this.host.y - pac.y) < .7) {
             pac.lives = 0;
             this.host.score += 500;
@@ -5959,6 +5972,70 @@ class Game {
         ...chosen
       };
     }
+  }
+  _pacUsePowerUp(pac) {
+    // Los CPU pacs usan el power-up contra el jugador-fantasma (this.host) que les persigue.
+    if (!pac.powerUp) return;
+    const kind = POWERUPS[pac.powerUp.type].kind;
+    const hunter = this.host;
+    const dist = Math.hypot(hunter.x - pac.x, hunter.y - pac.y);
+    let use = false;
+    switch (kind) {
+     case "shoes":
+      // Correr cuando el fantasma está cerca, para escapar
+      use = dist < 6;
+      break;
+
+     case "freeze":
+      // Congelar al fantasma cuando se acerca
+      use = dist < 5;
+      break;
+
+     case "teleport":
+      // Escape de emergencia
+      use = dist < 2.2;
+      break;
+
+     case "wave":
+      // Onda para eliminar al fantasma si está cerca
+      use = dist < 3.5;
+      break;
+
+     case "bomb":
+      // Bomba si el fantasma está muy cerca
+      use = dist < 2.5;
+      break;
+
+     case "magnet":
+      // No tiene mucho sentido para huir, pero la usan igual (recoge bolas cercanas)
+      use = true;
+      break;
+
+     case "missile":
+      {
+        // Disparar al fantasma si está alineado en fila o columna
+        const aligned = Math.abs(hunter.y - pac.y) < .8 || Math.abs(hunter.x - pac.x) < .8;
+        use = aligned;
+        if (use) {
+          if (Math.abs(hunter.y - pac.y) < .8) pac.dir = {
+            x: Math.sign(hunter.x - pac.x) || 1,
+            y: 0
+          }; else pac.dir = {
+            x: 0,
+            y: Math.sign(hunter.y - pac.y) || 1
+          };
+        }
+        break;
+      }
+
+     case "life":
+      use = pac.lives < MAX_LIVES;
+      break;
+
+     default:
+      use = dist < 4;
+    }
+    if (use) this.activatePowerUp(pac);
   }
   botThink() {
     const bot = this.guest;
