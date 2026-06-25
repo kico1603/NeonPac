@@ -890,7 +890,7 @@ const firebaseConfig = {
       <span data-i18n="hint_tail">· Come puntos · Esquiva los 6 fantasmas</span>
     </div>
     <div style="position: fixed; bottom: 8px; right: 12px; font-size: 13px; color: var(--muted); font-family: 'Press Start 2P', monospace; letter-spacing: 1px;">
-      v1.5
+      v1.6
     </div>
   </section>
 
@@ -2065,7 +2065,7 @@ const MODE_I18N = {
     },
     GHOST_MODE: {
       n: "BE THE GHOST",
-      e: "You control a ghost. The pacs are the CPU and eat dots.",
+      e: "You control a ghost. If a pac eats a power dot it can hunt YOU: run away or you fail.",
       g: "Hunt all the pacs before they eat every dot."
     }
   },
@@ -2122,7 +2122,7 @@ const MODE_I18N = {
     },
     GHOST_MODE: {
       n: "ERES EL FANTASMA",
-      e: "Controlas a un fantasma. Los pacs son la CPU y comen bolas.",
+      e: "Controlas a un fantasma. Si un pac come una bola de poder puede cazarte a TI: huye o fallas.",
       g: "Caza a todos los pacs antes de que se coman todas las bolas."
     }
   },
@@ -2179,7 +2179,7 @@ const MODE_I18N = {
     },
     GHOST_MODE: {
       n: "SOIS LE FANTÔME",
-      e: "Tu contrôles un fantôme. Les pacs sont le CPU et mangent les points.",
+      e: "Tu contrôles un fantôme. Si un pac mange une super-pastille, il peut te chasser : fuis ou tu échoues.",
       g: "Chasse tous les pacs avant qu'ils mangent tout."
     }
   },
@@ -2236,7 +2236,7 @@ const MODE_I18N = {
     },
     GHOST_MODE: {
       n: "SEJA O FANTASMA",
-      e: "Você controla um fantasma. Os pacs são a CPU e comem bolas.",
+      e: "Você controla um fantasma. Se um pac comer uma bola de poder, pode caçar VOCÊ: fuja ou falha.",
       g: "Cace todos os pacs antes que comam tudo."
     }
   },
@@ -2293,7 +2293,7 @@ const MODE_I18N = {
     },
     GHOST_MODE: {
       n: "SEI DER GEIST",
-      e: "Du steuerst einen Geist. Die Pacs sind die CPU und fressen Punkte.",
+      e: "Du steuerst einen Geist. Frisst ein Pac einen Kraftpunkt, jagt es DICH: flieh oder du scheiterst.",
       g: "Jage alle Pacs, bevor sie alles fressen."
     }
   },
@@ -2350,7 +2350,7 @@ const MODE_I18N = {
     },
     GHOST_MODE: {
       n: "你是幽灵",
-      e: "你控制一个幽灵。吃豆人由电脑控制并吃豆子。",
+      e: "你控制一个幽灵。如果吃豆人吃到能量豆，它会反过来追你：快逃，否则任务失败。",
       g: "在它们吃光所有豆子前抓住所有吃豆人。"
     }
   },
@@ -2407,7 +2407,7 @@ const MODE_I18N = {
     },
     GHOST_MODE: {
       n: "आप भूत हैं",
-      e: "आप एक भूत नियंत्रित करते हैं। पैक CPU हैं और बिंदु खाते हैं।",
+      e: "आप एक भूत नियंत्रित करते हैं। अगर पैक पावर बिंदु खाए तो वह आपको पकड़ सकता है: भागें वरना असफल।",
       g: "सब बिंदु खाने से पहले सभी पैक पकड़ें।"
     }
   },
@@ -2464,7 +2464,7 @@ const MODE_I18N = {
     },
     GHOST_MODE: {
       n: "كن الشبح",
-      e: "تتحكم بشبح. الباك مَن يتحكم بها الكمبيوتر وتأكل النقاط.",
+      e: "تتحكم بشبح. إذا أكل الباك كرة قوة فقد يطاردك أنت: اهرب وإلا تفشل.",
       g: "اصطد كل الباك قبل أن تأكل كل النقاط."
     }
   }
@@ -3299,6 +3299,9 @@ const FREEZE_DURATION = 3;
 
 const SPEED_BOOST_DURATION = 4;
 
+// Cuánto tiempo un pac de la CPU puede cazarte tras comer una bola de poder (modo "Eres el fantasma")
+const GHOST_MODE_EMPOWER_TIME = 8;
+
 const SPEED_BOOST_FACTOR = 1.5;
 
 const MAX_LIVES = 5;
@@ -3389,10 +3392,16 @@ function getAdvLevelConfig(n) {
     break;
 
    case 6:
-    mode = !newPowerup ? "HUNT" : "TIMETRIAL";
-    modeCfg = !newPowerup ? {} : {
-      baseTime: Math.max(35, 70 - world * 3)
-    };
+    if (newPowerup) {
+      mode = "TIMETRIAL";
+      modeCfg = {
+        baseTime: Math.max(35, 70 - world * 3)
+      };
+    } else {
+      // Mundos sin power-up nuevo (1 y 10): aquí iba HUNT repetido.
+      // Usamos el modo de muros/portales CONTRARIO al de la posición 7 para no repetir.
+      mode = world % 2 === 1 ? "PORTALS" : "DYNAMIC_WALLS";
+    }
     break;
 
    case 7:
@@ -5204,6 +5213,7 @@ class Game {
         const pac = new Player(sp.x, sp.y, colors[i % 3], "CPU" + (i + 1));
         pac.lives = 1;
         pac.aiSpeedFactor = .82;
+        pac.empoweredTimer = 0;
         this.adventure.state.cpuPacs.push(pac);
       }
     }
@@ -5468,6 +5478,15 @@ class Game {
             this.totalDots--;
             pac.chompTimer = .18;
           }
+          // Comer una bola de poder: el pac se empodera y puede cazarte a TI.
+          if (idx >= 0 && idx < this.pellets.length && this.pellets[idx]) {
+            this.pellets[idx] = 0;
+            pac.empoweredTimer = GHOST_MODE_EMPOWER_TIME;
+            this.spawnPopup(cx, cy, "¡TE PERSIGUE!", "#ff2bd6");
+            this.spawnParticles(cx, cy, "#ff2bd6", 18);
+            this.sfx.pellet && this.sfx.pellet();
+          }
+          if (pac.empoweredTimer > 0) pac.empoweredTimer -= dt;
           // Recoger el power-up del mapa si lo pisan
           if (this.powerUp && Math.round(this.powerUp.cellX) === cx && Math.round(this.powerUp.cellY) === cy) {
             pac.powerUp = { type: this.powerUp.type };
@@ -5479,16 +5498,28 @@ class Game {
           }
           // Usar el power-up contra el jugador-fantasma
           if (pac.powerUp) this._pacUsePowerUp(pac);
+          // Contacto fantasma <-> pac
           if (Math.hypot(this.host.x - pac.x, this.host.y - pac.y) < .7) {
-            pac.lives = 0;
-            this.host.score += 500;
-            this.spawnPopup(pac.x, pac.y, "¡CAZADO! +500", "#ff4040");
-            this.spawnParticles(pac.x, pac.y, pac.color, 24);
-            this.cameraShake = .4;
+            if (pac.empoweredTimer > 0) {
+              // El pac está empoderado: TE COME → fallas la misión
+              st.result = "lose";
+              this.spawnPopup(this.host.x, this.host.y, "¡TE HAN COMIDO!", "#ff2bd6");
+              this.spawnParticles(this.host.x, this.host.y, "#ff2bd6", 28);
+              this.cameraShake = .6;
+            } else {
+              // Pac normal: lo cazas
+              pac.lives = 0;
+              this.host.score += 500;
+              this.spawnPopup(pac.x, pac.y, "¡CAZADO! +500", "#ff4040");
+              this.spawnParticles(pac.x, pac.y, pac.color, 24);
+              this.cameraShake = .4;
+            }
           }
         }
         const alive = st.cpuPacs.filter(p => p.lives > 0).length;
-        if (alive === 0) st.result = "win"; else if (this.totalDots === 0) st.result = "lose";
+        if (st.result !== "lose") {
+          if (alive === 0) st.result = "win"; else if (this.totalDots === 0) st.result = "lose";
+        }
       }
       if (mode === "HUNT") {
         const before = this.ghosts.length;
@@ -5928,6 +5959,16 @@ class Game {
     } ];
     const {dist: dist, firstStep: firstStep} = this._botBFS(cx, cy);
     const hunter = this.host;
+    // Si el pac está empoderado (comió bola de poder), CAZA al fantasma en vez de huir.
+    if (pac.empoweredTimer > 0) {
+      const hx = Math.round(hunter.x), hy = Math.round(hunter.y);
+      if (hx >= 0 && hx < GRID_W && hy >= 0 && hy < GRID_H && firstStep[hy * GRID_W + hx] >= 0) {
+        const step = firstStep[hy * GRID_W + hx];
+        pac.dir = { ...DIRS4[step] };
+        pac.nextDir = { ...DIRS4[step] };
+        return;
+      }
+    }
     const dangerAt = (x, y) => {
       const d = Math.hypot(hunter.x - x, hunter.y - y);
       return d < 5 ? (5 - d) * (5 - d) : 0;
@@ -7437,6 +7478,24 @@ class Game {
     if (mode === "GHOST_MODE") {
       for (const pac of st.cpuPacs) {
         if (pac.lives <= 0) continue;
+        // Aura cuando está empoderado (puede cazarte): halo magenta pulsante
+        if (pac.empoweredTimer > 0) {
+          const px = pac.x * CELL + CELL / 2;
+          const py = pac.y * CELL + CELL / 2;
+          // Parpadeo en el último segundo y medio para avisar de que se acaba
+          const ending = pac.empoweredTimer < 1.5;
+          const blink = ending ? Math.sin(this.elapsedTime * 18) > 0 : true;
+          if (blink) {
+            ctx.save();
+            const pulse = .6 + .4 * Math.sin(this.elapsedTime * 6);
+            const aura = ctx.createRadialGradient(px, py, CELL * .2, px, py, CELL * 1.1);
+            aura.addColorStop(0, "rgba(255, 43, 214, " + (.5 * pulse).toFixed(3) + ")");
+            aura.addColorStop(1, "rgba(255, 43, 214, 0)");
+            ctx.fillStyle = aura;
+            ctx.fillRect(px - CELL * 1.1, py - CELL * 1.1, CELL * 2.2, CELL * 2.2);
+            ctx.restore();
+          }
+        }
         this.renderPlayer(pac);
       }
     }
