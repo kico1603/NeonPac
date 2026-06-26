@@ -921,6 +921,7 @@ const firebaseConfig = {
 
     <div class="card">
       <button class="btn" id="btn-adventure" style="border-color:#3bff9d; color:#3bff9d; box-shadow: inset 0 0 8px rgba(59,255,157,0.25), 0 0 8px rgba(59,255,157,0.3);" data-i18n="adventure">Aventura</button>
+      <button class="btn" id="btn-arcade" style="border-color:#ff9a3c; color:#ff9a3c; box-shadow: inset 0 0 8px rgba(255,154,60,0.25), 0 0 8px rgba(255,154,60,0.3);" data-i18n="arcade">Arcade</button>
       <button class="btn magenta" id="btn-solo" data-i18n="solo">Partida personalizada</button>
       <button class="btn yellow" id="btn-create" data-i18n="create">Crear sala</button>
       <div class="row">
@@ -938,7 +939,7 @@ const firebaseConfig = {
       <span data-i18n="hint_tail">· Come puntos · Esquiva los 6 fantasmas</span>
     </div>
     <div style="position: fixed; bottom: 8px; right: 12px; font-size: 13px; color: var(--muted); font-family: 'Press Start 2P', monospace; letter-spacing: 1px;">
-      v1.7
+      v1.8.2
     </div>
   </section>
 
@@ -1139,6 +1140,16 @@ const firebaseConfig = {
     </div>
   </div>
 
+  <!-- ====================== ARCADE ====================== -->
+  <div class="custom-overlay" id="arcade-overlay">
+    <div class="custom-panel" style="border-color:#ff9a3c; box-shadow:0 0 40px rgba(255,154,60,0.35);">
+      <h2 style="color:#ff9a3c; text-shadow:0 0 12px rgba(255,154,60,0.5);" data-i18n="arcade_title">ARCADE</h2>
+      <div style="font-size:13px; color:var(--muted); text-align:center; margin:-8px 0 16px; line-height:1.5;" data-i18n="arcade_sub">Niveles infinitos. La dificultad sube sin parar. ¡Aguanta con tus vidas!</div>
+      <div id="arcade-modes"></div>
+      <button class="custom-close" id="arcade-close" style="width:100%; margin-top:6px;" data-i18n="opt_close">CERRAR</button>
+    </div>
+  </div>
+
 <script>
 "use strict";
 
@@ -1282,7 +1293,7 @@ const I18N = {
     world: "WORLD",
     use_power_times: n => `Use the power-up successfully ${n} times.`,
     eat_dots: d => `Eat at least ${d} dots.`,
-    custom_title: "CUSTOM GAME", custom_mode: "Mode", custom_powerups: "Power-ups", custom_diff: "Difficulty", custom_size: "Map size", custom_start: "PLAY", custom_locked: "🔒 Locked", unlock_world: w => `Clear World ${w} in Adventure to unlock`, unlock_level: n => `Clear level ${n} in Adventure to unlock`, custom_none: "None", cm_CPU: "Vs CPU", cm_CLASSIC: "Classic", cm_HUNT: "Hunt", cm_INVISIBLE: "Invisible", cm_BLACKOUT: "Blackout", cm_TIMETRIAL: "Time Trial", cm_DYNAMIC_WALLS: "Moving Walls", cm_PORTALS: "Portals", cm_HORDE: "Horde", cm_GHOST_MODE: "Be the Ghost",
+    custom_title: "CUSTOM GAME", arcade: "Arcade", arcade_title: "ARCADE", arcade_sub: "Endless levels. Difficulty keeps rising. Survive with your lives!", arc_classic: "Classic", arc_cpu: "Vs CPU", arc_horde: "Horde (missiles)", arc_classic_d: "No power-ups · eat all the dots", arc_cpu_d: "Power-ups · outscore the rival", arc_horde_d: "Only missiles · survive", arc_over: "GAME OVER", arc_reached: "Reached", arc_new_record: "★ NEW RECORD!", arc_best: "Best", arc_record_short: "Best", custom_mode: "Mode", custom_powerups: "Power-ups", custom_diff: "Difficulty", custom_size: "Map size", custom_start: "PLAY", custom_locked: "🔒 Locked", unlock_world: w => `Clear World ${w} in Adventure to unlock`, unlock_level: n => `Clear level ${n} in Adventure to unlock`, custom_none: "None", cm_CPU: "Vs CPU", cm_CLASSIC: "Classic", cm_HUNT: "Hunt", cm_INVISIBLE: "Invisible", cm_BLACKOUT: "Blackout", cm_TIMETRIAL: "Time Trial", cm_DYNAMIC_WALLS: "Moving Walls", cm_PORTALS: "Portals", cm_HORDE: "Horde", cm_GHOST_MODE: "Be the Ghost",
     pad_connected: "🎮 Gamepad connected",
     inverted: "CONTROLS INVERTED",
     adv_title: "ADVENTURE MODE",
@@ -1397,7 +1408,7 @@ const I18N = {
     world: "MUNDO",
     use_power_times: n => `Usa el power-up con éxito ${n} veces.`,
     eat_dots: d => `Cómete al menos ${d} bolas.`,
-    custom_title: "PARTIDA PERSONALIZADA", custom_mode: "Modo", custom_powerups: "Power-ups", custom_diff: "Dificultad", custom_size: "Tamaño de mapa", custom_start: "JUGAR", custom_locked: "🔒 Bloqueado", unlock_world: w => `Supera el Mundo ${w} en Aventura para desbloquear`, unlock_level: n => `Supera el nivel ${n} en Aventura para desbloquear`, custom_none: "Ninguno", cm_CPU: "Contra CPU", cm_CLASSIC: "Clásico", cm_HUNT: "Caza", cm_INVISIBLE: "Invisibles", cm_BLACKOUT: "Apagón", cm_TIMETRIAL: "Contrarreloj", cm_DYNAMIC_WALLS: "Muros móviles", cm_PORTALS: "Portales", cm_HORDE: "Horda", cm_GHOST_MODE: "Eres el fantasma",
+    custom_title: "PARTIDA PERSONALIZADA", arcade: "Arcade", arcade_title: "ARCADE", arcade_sub: "Niveles infinitos. La dificultad sube sin parar. ¡Aguanta con tus vidas!", arc_classic: "Clásico", arc_cpu: "Contra CPU", arc_horde: "Horda (misiles)", arc_classic_d: "Sin power-ups · come todas las bolas", arc_cpu_d: "Con power-ups · supera al rival", arc_horde_d: "Solo misiles · sobrevive", arc_over: "FIN DE LA PARTIDA", arc_reached: "Has llegado a", arc_new_record: "★ ¡NUEVO RÉCORD!", arc_best: "Récord", arc_record_short: "Récord", custom_mode: "Modo", custom_powerups: "Power-ups", custom_diff: "Dificultad", custom_size: "Tamaño de mapa", custom_start: "JUGAR", custom_locked: "🔒 Bloqueado", unlock_world: w => `Supera el Mundo ${w} en Aventura para desbloquear`, unlock_level: n => `Supera el nivel ${n} en Aventura para desbloquear`, custom_none: "Ninguno", cm_CPU: "Contra CPU", cm_CLASSIC: "Clásico", cm_HUNT: "Caza", cm_INVISIBLE: "Invisibles", cm_BLACKOUT: "Apagón", cm_TIMETRIAL: "Contrarreloj", cm_DYNAMIC_WALLS: "Muros móviles", cm_PORTALS: "Portales", cm_HORDE: "Horda", cm_GHOST_MODE: "Eres el fantasma",
     pad_connected: "🎮 Mando conectado",
     inverted: "CONTROLES INVERTIDOS",
     adv_title: "MODO AVENTURA",
@@ -1512,7 +1523,7 @@ const I18N = {
     world: "MONDE",
     use_power_times: n => `Utilise le power-up avec succès ${n} fois.`,
     eat_dots: d => `Mange au moins ${d} points.`,
-    custom_title: "PARTIE PERSONNALISÉE", custom_mode: "Mode", custom_powerups: "Power-ups", custom_diff: "Difficulté", custom_size: "Taille du labyrinthe", custom_start: "JOUER", custom_locked: "🔒 Verrouillé", unlock_world: w => `Termine le Monde ${w} en Aventure pour débloquer`, unlock_level: n => `Termine le niveau ${n} en Aventure pour débloquer`, custom_none: "Aucun", cm_CPU: "Contre CPU", cm_CLASSIC: "Classique", cm_HUNT: "Chasse", cm_INVISIBLE: "Invisibles", cm_BLACKOUT: "Panne", cm_TIMETRIAL: "Contre-la-montre", cm_DYNAMIC_WALLS: "Murs mobiles", cm_PORTALS: "Portails", cm_HORDE: "Horde", cm_GHOST_MODE: "Sois le fantôme",
+    custom_title: "PARTIE PERSONNALISÉE", arcade: "Arcade", arcade_title: "ARCADE", arcade_sub: "Niveaux infinis. La difficulté monte sans cesse. Tiens avec tes vies !", arc_classic: "Classique", arc_cpu: "Contre CPU", arc_horde: "Horde (missiles)", arc_classic_d: "Sans power-ups · mange tous les points", arc_cpu_d: "Power-ups · dépasse le rival", arc_horde_d: "Missiles uniquement · survis", arc_over: "PARTIE TERMINÉE", arc_reached: "Atteint", arc_new_record: "★ NOUVEAU RECORD !", arc_best: "Record", arc_record_short: "Record", custom_mode: "Mode", custom_powerups: "Power-ups", custom_diff: "Difficulté", custom_size: "Taille du labyrinthe", custom_start: "JOUER", custom_locked: "🔒 Verrouillé", unlock_world: w => `Termine le Monde ${w} en Aventure pour débloquer`, unlock_level: n => `Termine le niveau ${n} en Aventure pour débloquer`, custom_none: "Aucun", cm_CPU: "Contre CPU", cm_CLASSIC: "Classique", cm_HUNT: "Chasse", cm_INVISIBLE: "Invisibles", cm_BLACKOUT: "Panne", cm_TIMETRIAL: "Contre-la-montre", cm_DYNAMIC_WALLS: "Murs mobiles", cm_PORTALS: "Portails", cm_HORDE: "Horde", cm_GHOST_MODE: "Sois le fantôme",
     pad_connected: "🎮 Manette connectée",
     inverted: "CONTRÔLES INVERSÉS",
     adv_title: "MODE AVENTURE",
@@ -1627,7 +1638,7 @@ const I18N = {
     world: "MUNDO",
     use_power_times: n => `Use o power-up com sucesso ${n} vezes.`,
     eat_dots: d => `Coma pelo menos ${d} bolas.`,
-    custom_title: "PARTIDA PERSONALIZADA", custom_mode: "Modo", custom_powerups: "Power-ups", custom_diff: "Dificuldade", custom_size: "Tamanho do mapa", custom_start: "JOGAR", custom_locked: "🔒 Bloqueado", unlock_world: w => `Complete o Mundo ${w} na Aventura para desbloquear`, unlock_level: n => `Complete o nível ${n} na Aventura para desbloquear`, custom_none: "Nenhum", cm_CPU: "Contra CPU", cm_CLASSIC: "Clássico", cm_HUNT: "Caça", cm_INVISIBLE: "Invisíveis", cm_BLACKOUT: "Apagão", cm_TIMETRIAL: "Contra o tempo", cm_DYNAMIC_WALLS: "Muros móveis", cm_PORTALS: "Portais", cm_HORDE: "Horda", cm_GHOST_MODE: "Seja o fantasma",
+    custom_title: "PARTIDA PERSONALIZADA", arcade: "Arcade", arcade_title: "ARCADE", arcade_sub: "Níveis infinitos. A dificuldade sobe sem parar. Aguente com suas vidas!", arc_classic: "Clássico", arc_cpu: "Contra CPU", arc_horde: "Horda (mísseis)", arc_classic_d: "Sem power-ups · coma todas as bolas", arc_cpu_d: "Com power-ups · supere o rival", arc_horde_d: "Só mísseis · sobreviva", arc_over: "FIM DE JOGO", arc_reached: "Chegou a", arc_new_record: "★ NOVO RECORDE!", arc_best: "Recorde", arc_record_short: "Recorde", custom_mode: "Modo", custom_powerups: "Power-ups", custom_diff: "Dificuldade", custom_size: "Tamanho do mapa", custom_start: "JOGAR", custom_locked: "🔒 Bloqueado", unlock_world: w => `Complete o Mundo ${w} na Aventura para desbloquear`, unlock_level: n => `Complete o nível ${n} na Aventura para desbloquear`, custom_none: "Nenhum", cm_CPU: "Contra CPU", cm_CLASSIC: "Clássico", cm_HUNT: "Caça", cm_INVISIBLE: "Invisíveis", cm_BLACKOUT: "Apagão", cm_TIMETRIAL: "Contra o tempo", cm_DYNAMIC_WALLS: "Muros móveis", cm_PORTALS: "Portais", cm_HORDE: "Horda", cm_GHOST_MODE: "Seja o fantasma",
     pad_connected: "🎮 Controle conectado",
     inverted: "CONTROLES INVERTIDOS",
     adv_title: "MODO AVENTURA",
@@ -1742,7 +1753,7 @@ const I18N = {
     world: "WELT",
     use_power_times: n => `Nutze das Power-up ${n} Mal erfolgreich.`,
     eat_dots: d => `Friss mindestens ${d} Punkte.`,
-    custom_title: "EIGENES SPIEL", custom_mode: "Modus", custom_powerups: "Power-ups", custom_diff: "Schwierigkeit", custom_size: "Kartengröße", custom_start: "SPIELEN", custom_locked: "🔒 Gesperrt", unlock_world: w => `Schließe Welt ${w} im Abenteuer ab zum Freischalten`, unlock_level: n => `Schließe Level ${n} im Abenteuer ab zum Freischalten`, custom_none: "Keine", cm_CPU: "Gegen CPU", cm_CLASSIC: "Klassisch", cm_HUNT: "Jagd", cm_INVISIBLE: "Unsichtbar", cm_BLACKOUT: "Blackout", cm_TIMETRIAL: "Zeitrennen", cm_DYNAMIC_WALLS: "Bewegliche Wände", cm_PORTALS: "Portale", cm_HORDE: "Horde", cm_GHOST_MODE: "Sei der Geist",
+    custom_title: "EIGENES SPIEL", arcade: "Arcade", arcade_title: "ARCADE", arcade_sub: "Endlose Level. Die Schwierigkeit steigt immer weiter. Halte mit deinen Leben durch!", arc_classic: "Klassisch", arc_cpu: "Gegen CPU", arc_horde: "Horde (Raketen)", arc_classic_d: "Keine Power-ups · friss alle Punkte", arc_cpu_d: "Power-ups · übertriff den Gegner", arc_horde_d: "Nur Raketen · überlebe", arc_over: "SPIEL VORBEI", arc_reached: "Erreicht", arc_new_record: "★ NEUER REKORD!", arc_best: "Rekord", arc_record_short: "Rekord", custom_mode: "Modus", custom_powerups: "Power-ups", custom_diff: "Schwierigkeit", custom_size: "Kartengröße", custom_start: "SPIELEN", custom_locked: "🔒 Gesperrt", unlock_world: w => `Schließe Welt ${w} im Abenteuer ab zum Freischalten`, unlock_level: n => `Schließe Level ${n} im Abenteuer ab zum Freischalten`, custom_none: "Keine", cm_CPU: "Gegen CPU", cm_CLASSIC: "Klassisch", cm_HUNT: "Jagd", cm_INVISIBLE: "Unsichtbar", cm_BLACKOUT: "Blackout", cm_TIMETRIAL: "Zeitrennen", cm_DYNAMIC_WALLS: "Bewegliche Wände", cm_PORTALS: "Portale", cm_HORDE: "Horde", cm_GHOST_MODE: "Sei der Geist",
     pad_connected: "🎮 Controller verbunden",
     inverted: "STEUERUNG UMGEKEHRT",
     adv_title: "ABENTEUER-MODUS",
@@ -1857,7 +1868,7 @@ const I18N = {
     world: "世界",
     use_power_times: n => `成功使用道具 ${n} 次。`,
     eat_dots: d => `吃掉至少 ${d} 颗豆子。`,
-    custom_title: "自定义对战", custom_mode: "模式", custom_powerups: "道具", custom_diff: "难度", custom_size: "地图大小", custom_start: "开始", custom_locked: "🔒 已锁定", unlock_world: w => `在冒险模式通关第 ${w} 世界以解锁`, unlock_level: n => `在冒险模式通关第 ${n} 关以解锁`, custom_none: "无", cm_CPU: "对战电脑", cm_CLASSIC: "经典", cm_HUNT: "狩猎", cm_INVISIBLE: "隐形", cm_BLACKOUT: "停电", cm_TIMETRIAL: "计时赛", cm_DYNAMIC_WALLS: "移动墙", cm_PORTALS: "传送门", cm_HORDE: "兽群", cm_GHOST_MODE: "你是幽灵",
+    custom_title: "自定义对战", arcade: "街机", arcade_title: "街机模式", arcade_sub: "无限关卡，难度不断上升。用你的生命坚持下去！", arc_classic: "经典", arc_cpu: "对战电脑", arc_horde: "兽群（导弹）", arc_classic_d: "无道具 · 吃光所有豆子", arc_cpu_d: "有道具 · 得分超过对手", arc_horde_d: "仅导弹 · 生存", arc_over: "游戏结束", arc_reached: "到达", arc_new_record: "★ 新纪录！", arc_best: "最高分", arc_record_short: "最高分", custom_mode: "模式", custom_powerups: "道具", custom_diff: "难度", custom_size: "地图大小", custom_start: "开始", custom_locked: "🔒 已锁定", unlock_world: w => `在冒险模式通关第 ${w} 世界以解锁`, unlock_level: n => `在冒险模式通关第 ${n} 关以解锁`, custom_none: "无", cm_CPU: "对战电脑", cm_CLASSIC: "经典", cm_HUNT: "狩猎", cm_INVISIBLE: "隐形", cm_BLACKOUT: "停电", cm_TIMETRIAL: "计时赛", cm_DYNAMIC_WALLS: "移动墙", cm_PORTALS: "传送门", cm_HORDE: "兽群", cm_GHOST_MODE: "你是幽灵",
     pad_connected: "🎮 手柄已连接",
     inverted: "控制已反转",
     adv_title: "冒险模式",
@@ -1972,7 +1983,7 @@ const I18N = {
     world: "दुनिया",
     use_power_times: n => `पावर-अप ${n} बार सफलतापूर्वक उपयोग करें।`,
     eat_dots: d => `कम से कम ${d} बिंदुएं खाएं।`,
-    custom_title: "कस्टम गेम", custom_mode: "मोड", custom_powerups: "पावर-अप", custom_diff: "कठिनाई", custom_size: "नक्शा आकार", custom_start: "खेलें", custom_locked: "🔒 लॉक", unlock_world: w => `अनलॉक के लिए एडवेंचर में दुनिया ${w} पूरी करें`, unlock_level: n => `अनलॉक के लिए एडवेंचर में स्तर ${n} पूरा करें`, custom_none: "कोई नहीं", cm_CPU: "CPU के विरुद्ध", cm_CLASSIC: "क्लासिक", cm_HUNT: "शिकार", cm_INVISIBLE: "अदृश्य", cm_BLACKOUT: "अंधेरा", cm_TIMETRIAL: "समय दौड़", cm_DYNAMIC_WALLS: "चलती दीवारें", cm_PORTALS: "पोर्टल", cm_HORDE: "भीड़", cm_GHOST_MODE: "आप भूत हैं",
+    custom_title: "कस्टम गेम", arcade: "आर्केड", arcade_title: "आर्केड", arcade_sub: "अनंत स्तर। कठिनाई बढ़ती रहती है। अपनी ज़िंदगियों से टिके रहें!", arc_classic: "क्लासिक", arc_cpu: "CPU के विरुद्ध", arc_horde: "भीड़ (मिसाइल)", arc_classic_d: "बिना पावर-अप · सारी बिंदुएं खाएं", arc_cpu_d: "पावर-अप · प्रतिद्वंद्वी से ज्यादा अंक", arc_horde_d: "केवल मिसाइल · टिके रहें", arc_over: "खेल समाप्त", arc_reached: "पहुंचे", arc_new_record: "★ नया रिकॉर्ड!", arc_best: "रिकॉर्ड", arc_record_short: "रिकॉर्ड", custom_mode: "मोड", custom_powerups: "पावर-अप", custom_diff: "कठिनाई", custom_size: "नक्शा आकार", custom_start: "खेलें", custom_locked: "🔒 लॉक", unlock_world: w => `अनलॉक के लिए एडवेंचर में दुनिया ${w} पूरी करें`, unlock_level: n => `अनलॉक के लिए एडवेंचर में स्तर ${n} पूरा करें`, custom_none: "कोई नहीं", cm_CPU: "CPU के विरुद्ध", cm_CLASSIC: "क्लासिक", cm_HUNT: "शिकार", cm_INVISIBLE: "अदृश्य", cm_BLACKOUT: "अंधेरा", cm_TIMETRIAL: "समय दौड़", cm_DYNAMIC_WALLS: "चलती दीवारें", cm_PORTALS: "पोर्टल", cm_HORDE: "भीड़", cm_GHOST_MODE: "आप भूत हैं",
     pad_connected: "🎮 गेमपैड कनेक्ट हुआ",
     inverted: "नियंत्रण उल्टे",
     adv_title: "एडवेंचर मोड",
@@ -2087,7 +2098,7 @@ const I18N = {
     world: "العالم",
     use_power_times: n => `استخدم القوة بنجاح ${n} مرات.`,
     eat_dots: d => `كل ما لا يقل عن ${d} نقطة.`,
-    custom_title: "مباراة مخصصة", custom_mode: "النمط", custom_powerups: "القوى", custom_diff: "الصعوبة", custom_size: "حجم الخريطة", custom_start: "العب", custom_locked: "🔒 مقفل", unlock_world: w => `أكمل العالم ${w} في المغامرة لفتحه`, unlock_level: n => `أكمل المستوى ${n} في المغامرة لفتحه`, custom_none: "لا شيء", cm_CPU: "ضد الكمبيوتر", cm_CLASSIC: "كلاسيكي", cm_HUNT: "صيد", cm_INVISIBLE: "خفية", cm_BLACKOUT: "انقطاع", cm_TIMETRIAL: "سباق الزمن", cm_DYNAMIC_WALLS: "جدران متحركة", cm_PORTALS: "بوابات", cm_HORDE: "حشد", cm_GHOST_MODE: "كن الشبح",
+    custom_title: "مباراة مخصصة", arcade: "أركيد", arcade_title: "أركيد", arcade_sub: "مستويات لا نهائية. الصعوبة ترتفع باستمرار. اصمد بأرواحك!", arc_classic: "كلاسيكي", arc_cpu: "ضد الكمبيوتر", arc_horde: "حشد (صواريخ)", arc_classic_d: "بدون قوى · كل كل النقاط", arc_cpu_d: "بقوى · تفوّق على الخصم", arc_horde_d: "صواريخ فقط · انجُ", arc_over: "انتهت اللعبة", arc_reached: "وصلت إلى", arc_new_record: "★ رقم قياسي جديد!", arc_best: "الأفضل", arc_record_short: "الأفضل", custom_mode: "النمط", custom_powerups: "القوى", custom_diff: "الصعوبة", custom_size: "حجم الخريطة", custom_start: "العب", custom_locked: "🔒 مقفل", unlock_world: w => `أكمل العالم ${w} في المغامرة لفتحه`, unlock_level: n => `أكمل المستوى ${n} في المغامرة لفتحه`, custom_none: "لا شيء", cm_CPU: "ضد الكمبيوتر", cm_CLASSIC: "كلاسيكي", cm_HUNT: "صيد", cm_INVISIBLE: "خفية", cm_BLACKOUT: "انقطاع", cm_TIMETRIAL: "سباق الزمن", cm_DYNAMIC_WALLS: "جدران متحركة", cm_PORTALS: "بوابات", cm_HORDE: "حشد", cm_GHOST_MODE: "كن الشبح",
     pad_connected: "🎮 تم توصيل وحدة التحكم",
     inverted: "التحكم معكوس",
     adv_title: "وضع المغامرة",
@@ -3542,14 +3553,14 @@ function getAdvLevelConfig(n) {
 const CUSTOM_MODES = [
   { id: "CPU",           unlockWorld: 0 },   // duelo contra la CPU (siempre)
   { id: "CLASSIC",       unlockWorld: 0 },   // clásico en solitario (siempre)
-  { id: "HUNT",          unlockWorld: 1 },   // aparece en mundo 1 → superar mundo 1
-  { id: "INVISIBLE",     unlockWorld: 1 },
-  { id: "BLACKOUT",      unlockWorld: 1 },
-  { id: "TIMETRIAL",     unlockWorld: 1 },
-  { id: "DYNAMIC_WALLS", unlockWorld: 1 },
-  { id: "PORTALS",       unlockWorld: 1 },
-  { id: "HORDE",         unlockWorld: 1 },
-  { id: "GHOST_MODE",    unlockWorld: 1 },
+  { id: "HUNT",          unlockWorld: 2 },   // caza: superar mundo 2
+  { id: "INVISIBLE",     unlockWorld: 3 },   // invisibles: superar mundo 3
+  { id: "TIMETRIAL",     unlockWorld: 4 },   // contrarreloj: superar mundo 4
+  { id: "BLACKOUT",      unlockWorld: 5 },   // apagón: superar mundo 5
+  { id: "DYNAMIC_WALLS", unlockWorld: 6 },   // muros móviles: superar mundo 6
+  { id: "PORTALS",       unlockWorld: 7 },   // portales: superar mundo 7
+  { id: "HORDE",         unlockWorld: 8 },   // horda: superar mundo 8
+  { id: "GHOST_MODE",    unlockWorld: 9 },   // eres el fantasma: superar mundo 9
 ];
 
 // ¿Se ha superado (completado) el mundo w? (sus 10 niveles)
@@ -3625,6 +3636,96 @@ function isMapSizeUnlocked(save, unlockLevel) {
 // Texto de "cómo desbloquear" para mostrar al pulsar algo bloqueado.
 function unlockHintWorld(w) { return t("unlock_world", w); }
 function unlockHintLevel(n) { return t("unlock_level", n); }
+
+
+
+// ============================================================
+// =======  MODO ARCADE (infinito, dificultad escalante)  ====
+// ============================================================
+const ARCADE_KEY = "neonpac_arcade_v1";
+const ARCADE_START_LIVES = 5;
+
+// Sub-modos del arcade
+const ARCADE_MODES = [
+  { id: "CLASSIC", powerups: [] },                 // clásico, sin power-ups, comer todas las bolas
+  { id: "CPU",     powerups: "ALL" },              // duelo con power-ups, superar a la CPU
+  { id: "HORDE",   powerups: [ "missile" ] },      // horda solo con misiles, sobrevivir
+];
+
+function arcadeLoad() {
+  try {
+    const raw = localStorage.getItem(ARCADE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return { best: {} };   // best[modeId] = puntuación récord
+}
+function arcadeSave(data) {
+  try {
+    localStorage.setItem(ARCADE_KEY, JSON.stringify(data));
+  } catch (e) {}
+}
+function arcadeBest(modeId) {
+  const s = arcadeLoad();
+  return s.best[modeId] || 0;
+}
+function arcadeSetBest(modeId, score) {
+  const s = arcadeLoad();
+  if (score > (s.best[modeId] || 0)) {
+    s.best[modeId] = score;
+    arcadeSave(s);
+    return true;
+  }
+  return false;
+}
+
+// Config de un nivel arcade dado el sub-modo y el número de nivel (1, 2, 3, ... infinito).
+// La dificultad escala SIN TECHO: más fantasmas, más velocidad, mapas más grandes.
+function getArcadeLevelConfig(modeId, level) {
+  // Escalado progresivo e ilimitado
+  const numGhosts = Math.min(2 + Math.floor(level / 2), 12);        // hasta 12 fantasmas en pantalla
+  const ghostSpeed = 3.6 + level * 0.18;                            // sin tope: acabará siendo absurdo
+  const ghostRevive = Math.max(1, 7 - level * 0.4);                 // reviven cada vez más rápido (mín 1s)
+  // El mapa crece hasta un máximo razonable (más allá no cabe en pantalla)
+  const mw = Math.min(13 + Math.floor(level / 2), 27);
+  const mh = Math.min(11 + Math.floor(level / 2), 23);
+  const loopPct = Math.max(0.14, 0.38 - level * 0.015);
+
+  let mode = modeId, modeCfg = {};
+  let powerups = [];
+  const m = ARCADE_MODES.find(x => x.id === modeId);
+  if (m) {
+    if (m.powerups === "ALL") powerups = ADV_POWERUP_UNLOCKS.slice();
+    else powerups = m.powerups.slice();
+  }
+  if (modeId === "CPU") {
+    // Duelo contra la CPU: reutiliza la maquinaria del modo BOSS.
+    mode = "BOSS";
+    modeCfg = { bossIndex: (level - 1) % 10 };
+  }
+  if (modeId === "HORDE") {
+    // Horda arcade: sobrevivir un tiempo que crece con el nivel (cada vez más largo y duro).
+    modeCfg = { survive: 25 + level * 5 };
+  }
+
+  return {
+    arcade: true,
+    arcadeMode: modeId,
+    level: level,
+    world: 1,
+    mode: mode,
+    modeCfg: modeCfg,
+    numGhosts: numGhosts,
+    ghostSpeed: ghostSpeed,
+    ghostRevive: ghostRevive,
+    mazeW: mw,
+    mazeH: mh,
+    loopPct: loopPct,
+    powerups: powerups,
+    dotTarget: 100,
+    dotGoal: 0,
+    custom: true   // reutiliza el final "custom" (sin tocar progreso de aventura)
+  };
+}
 
 
 const ADV_MODE_INFO = {
@@ -5143,6 +5244,7 @@ class Game {
     this.lastSweetEndTime = SWEET_FIRST_DELAY - SWEET_SPAWN_INTERVAL;
     this.stars = [];
     this.powerUp = null;
+    this.extraMissiles = [];
     this.powerUpNextSpawn = POWERUP_FIRST_DELAY;
     this.missiles = [];
     this.waves = [];
@@ -5325,7 +5427,14 @@ class Game {
     if (mode === "HORDE") {
       st.timer = cfg.modeCfg.survive;
       this.ghosts = this.ghosts.slice(0, 2);
-      st.hordeNextSpawn = 7;
+      // Tiempo entre apariciones: en arcade empieza alto y baja con el nivel.
+      if (cfg.arcade) {
+        st.hordeSpawnGap = Math.max(2.5, 9 - cfg.level * 0.4);
+        st.hordeNextSpawn = st.hordeSpawnGap;
+      } else {
+        st.hordeNextSpawn = 7;
+        st.hordeSpawnGap = 6;
+      }
       // En HORDA no hay bolas de poder (no se trata de comer fantasmas, sino de sobrevivir).
       for (let i = 0; i < this.pellets.length; i++) {
         if (this.pellets[i]) this.pellets[i] = 0;
@@ -5403,7 +5512,7 @@ class Game {
     }
     if (mode === "BOSS") {
       const w = cfg.world;
-      const diffIdx = Math.min(5, 1 + Math.floor(w / 2));
+      const diffIdx = cfg.arcade ? Math.min(5, 2 + Math.floor(cfg.level / 3)) : Math.min(5, 1 + Math.floor(w / 2));
       this.botConfig = BOT_DIFFICULTIES[diffIdx];
       this.guest.aiSpeedFactor = this.botConfig.speed;
       this.guest.bossIndex = cfg.modeCfg.bossIndex;
@@ -5539,12 +5648,19 @@ class Game {
       }
     }
     if (!this.powerUp && this.elapsedTime >= this.powerUpNextSpawn) {
-      this.spawnPowerUp();
+      // En arcade horda los misiles los gestiona el sistema múltiple, no el power-up único.
+      if (!(this.adventure && this.adventure.config.arcade && this.adventure.config.mode === "HORDE")) {
+        this.spawnPowerUp();
+      }
     }
+    // En arcade horda los misiles deben aparecer muy seguido (es el único recurso).
+    const isArcadeHorde = this.adventure && this.adventure.config.arcade && this.adventure.config.mode === "HORDE";
+    const afterExpire = isArcadeHorde ? 0.8 : POWERUP_AFTER_EXPIRE;
+    const afterPickup = isArcadeHorde ? 1.5 : POWERUP_AFTER_PICKUP;
     if (this.powerUp) {
       if (this.elapsedTime - this.powerUp.spawnedAt > POWERUP_VISIBLE_TIME) {
         this.powerUp = null;
-        this.powerUpNextSpawn = this.elapsedTime + POWERUP_AFTER_EXPIRE;
+        this.powerUpNextSpawn = this.elapsedTime + afterExpire;
       } else {
         let bestP = null, bestD = Infinity;
         for (const p of [ this.host, this.guest ]) {
@@ -5569,9 +5685,56 @@ class Game {
           this.spawnPopup(this.powerUp.cellX, this.powerUp.cellY, label, POWERUPS[this.powerUp.type].color);
           this.spawnParticles(this.powerUp.cellX, this.powerUp.cellY, POWERUPS[this.powerUp.type].color, 14);
           this.powerUp = null;
-          this.powerUpNextSpawn = this.elapsedTime + POWERUP_AFTER_PICKUP;
+          this.powerUpNextSpawn = this.elapsedTime + afterPickup;
         }
       }
+    }
+    // ----- Misiles múltiples (solo arcade horda): varios en el mapa a la vez -----
+    if (this.adventure && this.adventure.config.arcade && this.adventure.config.mode === "HORDE") {
+      const missileType = POWERUPS.findIndex(p => p.kind === "missile");
+      // Cuántos misiles a la vez y cada cuánto generar uno nuevo: escala con el nivel.
+      const lvl = this.adventure.config.level || 1;
+      const maxMissiles = Math.min(3 + Math.floor(lvl / 3), 8);
+      const spawnEvery = Math.max(1, 3 - lvl * 0.1);
+      if (this._extraMissileT === undefined) this._extraMissileT = 0;
+      this._extraMissileT -= dt;
+      if (this._extraMissileT <= 0 && this.extraMissiles.length < maxMissiles) {
+        this._extraMissileT = spawnEvery;
+        // Buscar una celda de pasillo libre (sin otro misil cerca)
+        const cands = [];
+        for (let y = 1; y < GRID_H - 1; y++) {
+          for (let x = 1; x < GRID_W - 1; x++) {
+            if (this.maze.grid[y][x] !== 0) continue;
+            if (this.extraMissiles.some(mm => mm.cellX === x && mm.cellY === y)) continue;
+            if (this.powerUp && this.powerUp.cellX === x && this.powerUp.cellY === y) continue;
+            cands.push({ x: x, y: y });
+          }
+        }
+        if (cands.length) {
+          const c = cands[Math.floor(Math.random() * cands.length)];
+          this.extraMissiles.push({ cellX: c.x, cellY: c.y, type: missileType, spawnedAt: this.elapsedTime });
+        }
+      }
+      // Caducidad y recogida
+      for (let i = this.extraMissiles.length - 1; i >= 0; i--) {
+        const mm = this.extraMissiles[i];
+        if (this.elapsedTime - mm.spawnedAt > POWERUP_VISIBLE_TIME) {
+          this.extraMissiles.splice(i, 1);
+          continue;
+        }
+        const p = this.host;
+        if (p.lives > 0 && p.respawnTimer <= 0 && Math.round(p.x) === mm.cellX && Math.round(p.y) === mm.cellY) {
+          const replacing = !!p.powerUp;
+          p.powerUp = { type: mm.type };
+          if (p === this.local) this.sfx.beep && this.sfx.beep(720, .06, "triangle", .05);
+          const label = (replacing ? "↻ " : "") + POWERUPS[mm.type].name.toUpperCase();
+          this.spawnPopup(mm.cellX, mm.cellY, label, POWERUPS[mm.type].color);
+          this.spawnParticles(mm.cellX, mm.cellY, POWERUPS[mm.type].color, 12);
+          this.extraMissiles.splice(i, 1);
+        }
+      }
+    } else if (this.extraMissiles.length) {
+      this.extraMissiles = [];
     }
     this.updateProjectiles(dt);
     if (this.adventure && !this.gameOver) {
@@ -5586,9 +5749,18 @@ class Game {
       }
       if (mode === "HORDE") {
         st.timer -= dt;
+        // En arcade, los fantasmas matados (con misil) NO reviven: se eliminan del todo.
+        if (this.adventure.config.arcade) {
+          const before = this.ghosts.length;
+          this.ghosts = this.ghosts.filter(g => !g.eaten);
+          if (this.ghosts.length < before) {
+            this.stars = this.stars.filter(s => this.ghosts.includes(s.target));
+          }
+        }
         st.hordeNextSpawn -= dt;
-        if (st.hordeNextSpawn <= 0 && this.ghosts.length < 10) {
-          st.hordeNextSpawn = 6;
+        const maxGhosts = this.adventure.config.arcade ? 16 : 10;
+        if (st.hordeNextSpawn <= 0 && this.ghosts.length < maxGhosts) {
+          st.hordeNextSpawn = st.hordeSpawnGap || 6;
           const gs = this.maze.ghostSpawn;
           const personalities = [ "blinky", "pinky", "inky", "clyde" ];
           const idx = this.ghosts.length;
@@ -5731,6 +5903,8 @@ class Game {
         if (this.totalDots === 0 || this.guest.lives <= 0 || this.host.lives <= 0) {
           st.result = this.host.score > this.guest.score ? "win" : "lose";
         }
+        // En arcade (duelo CPU infinito): si la CPU te supera en puntos, pierdes al instante.
+        if (adv.config.arcade && this.guest.score > this.host.score) st.result = "lose";
       }
       if (mode !== "BOSS" && this.host.lives <= 0) st.result = "lose";
       if (st.result) {
@@ -7142,6 +7316,17 @@ class Game {
       if (!blinking || Math.floor(performance.now() / 130) % 2 === 0) {
         const px = pu.cellX * CELL + CELL / 2;
         const py = pu.cellY * CELL + CELL / 2;
+        drawPowerUp(this.ctx, def.kind, px, py, CELL * .7, def.color, performance.now() / 1e3);
+      }
+    }
+    // Misiles múltiples (arcade horda)
+    for (const mm of this.extraMissiles) {
+      const def = POWERUPS[mm.type];
+      const age = this.elapsedTime - mm.spawnedAt;
+      const blinking = age > POWERUP_VISIBLE_TIME - 1;
+      if (!blinking || Math.floor(performance.now() / 130) % 2 === 0) {
+        const px = mm.cellX * CELL + CELL / 2;
+        const py = mm.cellY * CELL + CELL / 2;
         drawPowerUp(this.ctx, def.kind, px, py, CELL * .7, def.color, performance.now() / 1e3);
       }
     }
@@ -8955,9 +9140,84 @@ async function startCustomGame() {
   });
 }
 
+// Estado del arcade en curso
+const arcadeState = { mode: "CLASSIC", level: 1, lives: ARCADE_START_LIVES, score: 0 };
+
+function startArcade(modeId) {
+  arcadeState.mode = modeId;
+  arcadeState.level = 1;
+  arcadeState.lives = ARCADE_START_LIVES;
+  arcadeState.score = 0;
+  startArcadeLevel();
+}
+
+async function startArcadeLevel() {
+  const cfg = getArcadeLevelConfig(arcadeState.mode, arcadeState.level);
+  setMapSize(cfg.mazeW, cfg.mazeH);
+  MAZE_LOOP_PCT = cfg.loopPct;
+  GHOST_SPEED = cfg.ghostSpeed;
+  const seed = Math.floor(Math.random() * 1e9);
+  game.setupMaze(seed);
+  game.setupActors();
+  game.setLocalRole(true);
+  game.soloMode = arcadeState.mode === "CPU";
+  game.botConfig = BOT_DIFFICULTIES[Math.min(5, 2 + Math.floor(arcadeState.level / 3))];
+  game.customPowerups = null;
+  game.setupAdventure(cfg);
+  // Mantener vidas y puntuación acumuladas entre niveles
+  game.host.lives = arcadeState.lives;
+  game.host.score = arcadeState.score;
+  // Objetivo de bolas para modos de comer (90% del mapa real)
+  if ([ "CLASSIC", "INVISIBLE", "BLACKOUT", "TIMETRIAL", "DYNAMIC_WALLS", "PORTALS" ].includes(cfg.mode)) {
+    const target = Math.round(game.totalDots * .9);
+    game.adventure.state.dotsAtStart = game.totalDots;
+    game.adventure.state.dotsNeeded = Math.max(1, target);
+  }
+  showScreen("game");
+  document.getElementById("hud-room").textContent = "ARCADE L" + arcadeState.level;
+  game.render();
+  await countdownThen(() => {
+    sfx.start();
+    runHostLoop();
+  });
+}
+
 function onAdventureEnd() {
   const adv = game.adventure;
   const won = adv.state.result === "win";
+  // ----- MODO ARCADE (infinito) -----
+  if (adv.config.arcade) {
+    arcadeState.score = game.host.score;   // puntuación acumulada
+    if (won) {
+      // Nivel superado: avanzar al siguiente (más difícil) manteniendo vidas y puntos.
+      arcadeState.lives = game.host.lives;
+      arcadeState.level++;
+      hideOverlay();
+      resetAfterAdventure();
+      startArcadeLevel();
+      return;
+    }
+    // Derrota: fin del arcade. Guardar récord.
+    const isRecord = arcadeSetBest(arcadeState.mode, arcadeState.score);
+    const best = arcadeBest(arcadeState.mode);
+    const recordLine = isRecord ? `<div style="font-size:13px;color:var(--yellow);margin-top:6px;">${t("arc_new_record")}</div>` : `<div style="font-size:12px;color:var(--muted);margin-top:6px;">${t("arc_best")}: ${best}</div>`;
+    showOverlay(`\n    <div class="big" style="color: var(--magenta);">${t("arc_over")}</div>\n    <div style="font-size: 18px; margin-top: 8px;">${t("arc_reached")}: ${t("level")} ${arcadeState.level}</div>\n    <div style="font-size: 16px; margin-top: 4px;">${t("points")}: ${arcadeState.score}</div>\n    ${recordLine}\n    <button class="btn cyan" id="btn-arc-again" style="margin-top:18px;">${t("retry")}</button>\n    <button class="btn" id="btn-arc-exit" style="margin-top:10px;">${t("back_menu")}</button>\n  `);
+    setTimeout(() => {
+      const again = document.getElementById("btn-arc-again");
+      if (again) again.addEventListener("click", () => {
+        hideOverlay();
+        resetAfterAdventure();
+        startArcade(arcadeState.mode);
+      });
+      const exit = document.getElementById("btn-arc-exit");
+      if (exit) exit.addEventListener("click", () => {
+        hideOverlay();
+        resetAfterAdventure();
+        showScreen("menu");
+      });
+    }, 50);
+    return;
+  }
   // Partida personalizada: no guarda progreso ni usa los botones de aventura.
   if (adv.config.custom) {
     const title2 = won ? `<div class="big" style="color: var(--yellow);">${t("win")}</div>` : `<div class="big" style="color: var(--magenta);">${t("lose")}</div>`;
@@ -9029,6 +9289,43 @@ document.getElementById("btn-adv-back").addEventListener("click", () => {
 document.getElementById("btn-solo").addEventListener("click", () => {
   initAudio();
   openCustomGame();
+});
+
+document.getElementById("btn-arcade").addEventListener("click", () => {
+  initAudio();
+  renderArcadePanel();
+  document.getElementById("arcade-overlay").classList.add("active");
+});
+function closeArcadePanel() {
+  document.getElementById("arcade-overlay").classList.remove("active");
+}
+function renderArcadePanel() {
+  const box = document.getElementById("arcade-modes");
+  const info = {
+    CLASSIC: { name: t("arc_classic"), desc: t("arc_classic_d"), color: "#3bff9d" },
+    CPU: { name: t("arc_cpu"), desc: t("arc_cpu_d"), color: "#ff2bd6" },
+    HORDE: { name: t("arc_horde"), desc: t("arc_horde_d"), color: "#ff9a3c" },
+  };
+  box.innerHTML = "";
+  for (const m of ARCADE_MODES) {
+    const i = info[m.id];
+    const best = arcadeBest(m.id);
+    const btn = document.createElement("button");
+    btn.className = "btn";
+    btn.style.cssText = `border-color:${i.color}; color:${i.color}; display:block; width:100%; margin:8px 0; font-size:11px; text-align:left; padding:12px 14px;`;
+    btn.innerHTML = `<div style="font-size:12px;">${i.name}</div>
+      <div style="font-size:10px; color:var(--muted); margin-top:5px; font-family:Arial,sans-serif; text-transform:none;">${i.desc}</div>
+      <div style="font-size:9px; color:${i.color}; margin-top:5px;">${t("arc_record_short")}: ${best}</div>`;
+    btn.addEventListener("click", () => {
+      closeArcadePanel();
+      startArcade(m.id);
+    });
+    box.appendChild(btn);
+  }
+}
+document.getElementById("arcade-close").addEventListener("click", closeArcadePanel);
+document.getElementById("arcade-overlay").addEventListener("click", e => {
+  if (e.target.id === "arcade-overlay") closeArcadePanel();
 });
 
 // Estado de selección actual de la partida personalizada
