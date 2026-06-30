@@ -939,7 +939,7 @@ const firebaseConfig = {
       <span data-i18n="hint_tail">· Come puntos · Esquiva los 6 fantasmas</span>
     </div>
     <div style="position: fixed; bottom: 8px; right: 12px; font-size: 13px; color: var(--muted); font-family: 'Press Start 2P', monospace; letter-spacing: 1px;">
-      v1.8.2
+      v1.8.3
     </div>
   </section>
 
@@ -5700,14 +5700,27 @@ class Game {
       this._extraMissileT -= dt;
       if (this._extraMissileT <= 0 && this.extraMissiles.length < maxMissiles) {
         this._extraMissileT = spawnEvery;
-        // Buscar una celda de pasillo libre (sin otro misil cerca)
+        // Buscar una celda VÁLIDA: donde haya una bola (garantiza que es transitable y
+        // visible como pasillo, igual criterio que el resto de objetos del juego).
         const cands = [];
         for (let y = 1; y < GRID_H - 1; y++) {
           for (let x = 1; x < GRID_W - 1; x++) {
             if (this.maze.grid[y][x] !== 0) continue;
+            const idx = y * GRID_W + x;
+            // Preferir celdas con bola (transitables seguras); evitar el spawn de fantasmas
+            if (!this.dots[idx] && !this.pellets[idx]) continue;
             if (this.extraMissiles.some(mm => mm.cellX === x && mm.cellY === y)) continue;
-            if (this.powerUp && this.powerUp.cellX === x && this.powerUp.cellY === y) continue;
             cands.push({ x: x, y: y });
+          }
+        }
+        // Si ya no quedan bolas (raro), permitir cualquier pasillo como respaldo
+        if (!cands.length) {
+          for (let y = 1; y < GRID_H - 1; y++) {
+            for (let x = 1; x < GRID_W - 1; x++) {
+              if (this.maze.grid[y][x] !== 0) continue;
+              if (this.extraMissiles.some(mm => mm.cellX === x && mm.cellY === y)) continue;
+              cands.push({ x: x, y: y });
+            }
           }
         }
         if (cands.length) {
