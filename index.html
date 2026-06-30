@@ -939,7 +939,7 @@ const firebaseConfig = {
       <span data-i18n="hint_tail">· Come puntos · Esquiva los 6 fantasmas</span>
     </div>
     <div style="position: fixed; bottom: 8px; right: 12px; font-size: 13px; color: var(--muted); font-family: 'Press Start 2P', monospace; letter-spacing: 1px;">
-      v1.8.3
+      v1.8.4
     </div>
   </section>
 
@@ -7334,6 +7334,9 @@ class Game {
     }
     // Misiles múltiples (arcade horda)
     for (const mm of this.extraMissiles) {
+      // Seguridad extra: no dibujar nunca un misil cuya celda no sea pasillo transitable.
+      const row = this.maze.grid[mm.cellY];
+      if (!row || row[mm.cellX] !== 0) continue;
       const def = POWERUPS[mm.type];
       const age = this.elapsedTime - mm.spawnedAt;
       const blinking = age > POWERUP_VISIBLE_TIME - 1;
