@@ -512,6 +512,13 @@
   }
   .mute-btn.muted:hover { background: var(--magenta); color: var(--bg); }
 
+  /* Botón de pausa: al lado del de mute (a su izquierda). Solo visible en partida. */
+  .pause-btn {
+    right: calc(62px + env(safe-area-inset-right));
+    display: none !important;
+  }
+  body.in-game .pause-btn { display: flex !important; }
+
   @media (max-width: 800px) {
     .setup-intro { font-size: 15px; }
     .setup-steps { font-size: 14px; padding-left: 20px; }
@@ -939,7 +946,7 @@ const firebaseConfig = {
       <span data-i18n="hint_tail">· Come puntos · Esquiva los 6 fantasmas</span>
     </div>
     <div style="position: fixed; bottom: 8px; right: 12px; font-size: 13px; color: var(--muted); font-family: 'Press Start 2P', monospace; letter-spacing: 1px;">
-      v1.8.4
+      v1.9.1
     </div>
   </section>
 
@@ -989,6 +996,17 @@ const firebaseConfig = {
 
       <canvas id="canvas"></canvas>
 
+      <div id="pause-overlay" style="position:absolute; inset:0; z-index:40; display:none; align-items:center; justify-content:center; background:rgba(4,2,14,0.9); backdrop-filter:blur(4px);">
+        <div style="background:#0a0520; border:2px solid var(--cyan); box-shadow:0 0 40px rgba(0,246,255,0.3); border-radius:14px; padding:24px; width:min(420px,92%); text-align:center;">
+          <h2 style="font-family:'Press Start 2P',monospace; font-size:16px; color:var(--cyan); margin:0 0 18px; text-shadow:0 0 12px rgba(0,246,255,0.5);" data-i18n="pause_title">PAUSA</h2>
+          <button class="btn cyan" id="pause-resume" style="display:block; width:100%; margin:8px 0; font-size:12px;" data-i18n="pause_resume">▶ Reanudar</button>
+          <button class="btn" id="pause-mute" style="display:block; width:100%; margin:8px 0; font-size:11px;" data-i18n="pause_mute">🔊 Silenciar todo</button>
+          <button class="btn" id="pause-help" style="display:block; width:100%; margin:8px 0; font-size:11px; border-color:var(--yellow); color:var(--yellow);" data-i18n="pause_help">📖 Instrucciones</button>
+          <button class="btn magenta" id="pause-exit" style="display:block; width:100%; margin:8px 0; font-size:11px;" data-i18n="pause_exit">✖ Salir</button>
+          <div id="pause-help-box" style="display:none; margin-top:14px; padding:12px; background:rgba(255,212,0,0.06); border:1px solid rgba(255,212,0,0.25); border-radius:8px; text-align:left; font-family:Arial,sans-serif; font-size:13px; line-height:1.5; color:var(--text);"></div>
+        </div>
+      </div>
+
       <div class="swipe-hint">↑ ↓ ← → &nbsp; Desliza para moverte</div>
       <div class="overlay" id="overlay"></div>
       <div class="toast" id="toast" style="display: none;"></div>
@@ -1002,7 +1020,8 @@ const firebaseConfig = {
     </div>
   </section>
   
-  <button id="btn-mute" class="mute-btn" aria-label="Música on/off" title="Música on/off">🔊</button>
+  <button id="btn-mute" class="mute-btn" aria-label="Sonido on/off" title="Sonido on/off">🔊</button>
+  <button id="btn-pause" class="mute-btn pause-btn" aria-label="Pausa" title="Pausa">⏸</button>
 
 </div>
 
@@ -1293,7 +1312,7 @@ const I18N = {
     world: "WORLD",
     use_power_times: n => `Use the power-up successfully ${n} times.`,
     eat_dots: d => `Eat at least ${d} dots.`,
-    custom_title: "CUSTOM GAME", arcade: "Arcade", arcade_title: "ARCADE", arcade_sub: "Endless levels. Difficulty keeps rising. Survive with your lives!", arc_classic: "Classic", arc_cpu: "Vs CPU", arc_horde: "Horde (missiles)", arc_classic_d: "No power-ups · eat all the dots", arc_cpu_d: "Power-ups · outscore the rival", arc_horde_d: "Only missiles · survive", arc_over: "GAME OVER", arc_reached: "Reached", arc_new_record: "★ NEW RECORD!", arc_best: "Best", arc_record_short: "Best", custom_mode: "Mode", custom_powerups: "Power-ups", custom_diff: "Difficulty", custom_size: "Map size", custom_start: "PLAY", custom_locked: "🔒 Locked", unlock_world: w => `Clear World ${w} in Adventure to unlock`, unlock_level: n => `Clear level ${n} in Adventure to unlock`, custom_none: "None", cm_CPU: "Vs CPU", cm_CLASSIC: "Classic", cm_HUNT: "Hunt", cm_INVISIBLE: "Invisible", cm_BLACKOUT: "Blackout", cm_TIMETRIAL: "Time Trial", cm_DYNAMIC_WALLS: "Moving Walls", cm_PORTALS: "Portals", cm_HORDE: "Horde", cm_GHOST_MODE: "Be the Ghost",
+    custom_title: "CUSTOM GAME", arcade: "Arcade", arcade_title: "ARCADE", arcade_sub: "Endless levels. Difficulty keeps rising. Survive with your lives!", pause_title: "PAUSED", pause_resume: "▶ Resume", pause_mute: "🔊 Mute all", pause_unmute: "🔇 Unmute", pause_help: "📖 Instructions", pause_exit: "✖ Quit", pause_goal: "Goal", pause_effect: "Effect", mp_no_pause: "not available online", arc_classic: "Classic", arc_cpu: "Vs CPU", arc_horde: "Horde (missiles)", arc_classic_d: "No power-ups · eat all the dots", arc_cpu_d: "Power-ups · outscore the rival", arc_horde_d: "Only missiles · survive", arc_over: "GAME OVER", arc_reached: "Reached", arc_new_record: "★ NEW RECORD!", arc_best: "Best", arc_record_short: "Best", custom_mode: "Mode", custom_powerups: "Power-ups", custom_diff: "Difficulty", custom_size: "Map size", custom_start: "PLAY", custom_locked: "🔒 Locked", unlock_world: w => `Clear World ${w} in Adventure to unlock`, unlock_level: n => `Clear level ${n} in Adventure to unlock`, custom_none: "None", cm_CPU: "Vs CPU", cm_CLASSIC: "Classic", cm_HUNT: "Hunt", cm_INVISIBLE: "Invisible", cm_BLACKOUT: "Blackout", cm_TIMETRIAL: "Time Trial", cm_DYNAMIC_WALLS: "Moving Walls", cm_PORTALS: "Portals", cm_HORDE: "Horde", cm_GHOST_MODE: "Be the Ghost",
     pad_connected: "🎮 Gamepad connected",
     inverted: "CONTROLS INVERTED",
     adv_title: "ADVENTURE MODE",
@@ -1408,7 +1427,7 @@ const I18N = {
     world: "MUNDO",
     use_power_times: n => `Usa el power-up con éxito ${n} veces.`,
     eat_dots: d => `Cómete al menos ${d} bolas.`,
-    custom_title: "PARTIDA PERSONALIZADA", arcade: "Arcade", arcade_title: "ARCADE", arcade_sub: "Niveles infinitos. La dificultad sube sin parar. ¡Aguanta con tus vidas!", arc_classic: "Clásico", arc_cpu: "Contra CPU", arc_horde: "Horda (misiles)", arc_classic_d: "Sin power-ups · come todas las bolas", arc_cpu_d: "Con power-ups · supera al rival", arc_horde_d: "Solo misiles · sobrevive", arc_over: "FIN DE LA PARTIDA", arc_reached: "Has llegado a", arc_new_record: "★ ¡NUEVO RÉCORD!", arc_best: "Récord", arc_record_short: "Récord", custom_mode: "Modo", custom_powerups: "Power-ups", custom_diff: "Dificultad", custom_size: "Tamaño de mapa", custom_start: "JUGAR", custom_locked: "🔒 Bloqueado", unlock_world: w => `Supera el Mundo ${w} en Aventura para desbloquear`, unlock_level: n => `Supera el nivel ${n} en Aventura para desbloquear`, custom_none: "Ninguno", cm_CPU: "Contra CPU", cm_CLASSIC: "Clásico", cm_HUNT: "Caza", cm_INVISIBLE: "Invisibles", cm_BLACKOUT: "Apagón", cm_TIMETRIAL: "Contrarreloj", cm_DYNAMIC_WALLS: "Muros móviles", cm_PORTALS: "Portales", cm_HORDE: "Horda", cm_GHOST_MODE: "Eres el fantasma",
+    custom_title: "PARTIDA PERSONALIZADA", arcade: "Arcade", arcade_title: "ARCADE", arcade_sub: "Niveles infinitos. La dificultad sube sin parar. ¡Aguanta con tus vidas!", pause_title: "PAUSA", pause_resume: "▶ Reanudar", pause_mute: "🔊 Silenciar todo", pause_unmute: "🔇 Activar sonido", pause_help: "📖 Instrucciones", pause_exit: "✖ Salir", pause_goal: "Objetivo", pause_effect: "Efecto", mp_no_pause: "no disponible online", arc_classic: "Clásico", arc_cpu: "Contra CPU", arc_horde: "Horda (misiles)", arc_classic_d: "Sin power-ups · come todas las bolas", arc_cpu_d: "Con power-ups · supera al rival", arc_horde_d: "Solo misiles · sobrevive", arc_over: "FIN DE LA PARTIDA", arc_reached: "Has llegado a", arc_new_record: "★ ¡NUEVO RÉCORD!", arc_best: "Récord", arc_record_short: "Récord", custom_mode: "Modo", custom_powerups: "Power-ups", custom_diff: "Dificultad", custom_size: "Tamaño de mapa", custom_start: "JUGAR", custom_locked: "🔒 Bloqueado", unlock_world: w => `Supera el Mundo ${w} en Aventura para desbloquear`, unlock_level: n => `Supera el nivel ${n} en Aventura para desbloquear`, custom_none: "Ninguno", cm_CPU: "Contra CPU", cm_CLASSIC: "Clásico", cm_HUNT: "Caza", cm_INVISIBLE: "Invisibles", cm_BLACKOUT: "Apagón", cm_TIMETRIAL: "Contrarreloj", cm_DYNAMIC_WALLS: "Muros móviles", cm_PORTALS: "Portales", cm_HORDE: "Horda", cm_GHOST_MODE: "Eres el fantasma",
     pad_connected: "🎮 Mando conectado",
     inverted: "CONTROLES INVERTIDOS",
     adv_title: "MODO AVENTURA",
@@ -1523,7 +1542,7 @@ const I18N = {
     world: "MONDE",
     use_power_times: n => `Utilise le power-up avec succès ${n} fois.`,
     eat_dots: d => `Mange au moins ${d} points.`,
-    custom_title: "PARTIE PERSONNALISÉE", arcade: "Arcade", arcade_title: "ARCADE", arcade_sub: "Niveaux infinis. La difficulté monte sans cesse. Tiens avec tes vies !", arc_classic: "Classique", arc_cpu: "Contre CPU", arc_horde: "Horde (missiles)", arc_classic_d: "Sans power-ups · mange tous les points", arc_cpu_d: "Power-ups · dépasse le rival", arc_horde_d: "Missiles uniquement · survis", arc_over: "PARTIE TERMINÉE", arc_reached: "Atteint", arc_new_record: "★ NOUVEAU RECORD !", arc_best: "Record", arc_record_short: "Record", custom_mode: "Mode", custom_powerups: "Power-ups", custom_diff: "Difficulté", custom_size: "Taille du labyrinthe", custom_start: "JOUER", custom_locked: "🔒 Verrouillé", unlock_world: w => `Termine le Monde ${w} en Aventure pour débloquer`, unlock_level: n => `Termine le niveau ${n} en Aventure pour débloquer`, custom_none: "Aucun", cm_CPU: "Contre CPU", cm_CLASSIC: "Classique", cm_HUNT: "Chasse", cm_INVISIBLE: "Invisibles", cm_BLACKOUT: "Panne", cm_TIMETRIAL: "Contre-la-montre", cm_DYNAMIC_WALLS: "Murs mobiles", cm_PORTALS: "Portails", cm_HORDE: "Horde", cm_GHOST_MODE: "Sois le fantôme",
+    custom_title: "PARTIE PERSONNALISÉE", arcade: "Arcade", arcade_title: "ARCADE", arcade_sub: "Niveaux infinis. La difficulté monte sans cesse. Tiens avec tes vies !", pause_title: "PAUSE", pause_resume: "▶ Reprendre", pause_mute: "🔊 Tout couper", pause_unmute: "🔇 Réactiver", pause_help: "📖 Instructions", pause_exit: "✖ Quitter", pause_goal: "Objectif", pause_effect: "Effet", mp_no_pause: "indisponible en ligne", arc_classic: "Classique", arc_cpu: "Contre CPU", arc_horde: "Horde (missiles)", arc_classic_d: "Sans power-ups · mange tous les points", arc_cpu_d: "Power-ups · dépasse le rival", arc_horde_d: "Missiles uniquement · survis", arc_over: "PARTIE TERMINÉE", arc_reached: "Atteint", arc_new_record: "★ NOUVEAU RECORD !", arc_best: "Record", arc_record_short: "Record", custom_mode: "Mode", custom_powerups: "Power-ups", custom_diff: "Difficulté", custom_size: "Taille du labyrinthe", custom_start: "JOUER", custom_locked: "🔒 Verrouillé", unlock_world: w => `Termine le Monde ${w} en Aventure pour débloquer`, unlock_level: n => `Termine le niveau ${n} en Aventure pour débloquer`, custom_none: "Aucun", cm_CPU: "Contre CPU", cm_CLASSIC: "Classique", cm_HUNT: "Chasse", cm_INVISIBLE: "Invisibles", cm_BLACKOUT: "Panne", cm_TIMETRIAL: "Contre-la-montre", cm_DYNAMIC_WALLS: "Murs mobiles", cm_PORTALS: "Portails", cm_HORDE: "Horde", cm_GHOST_MODE: "Sois le fantôme",
     pad_connected: "🎮 Manette connectée",
     inverted: "CONTRÔLES INVERSÉS",
     adv_title: "MODE AVENTURE",
@@ -1638,7 +1657,7 @@ const I18N = {
     world: "MUNDO",
     use_power_times: n => `Use o power-up com sucesso ${n} vezes.`,
     eat_dots: d => `Coma pelo menos ${d} bolas.`,
-    custom_title: "PARTIDA PERSONALIZADA", arcade: "Arcade", arcade_title: "ARCADE", arcade_sub: "Níveis infinitos. A dificuldade sobe sem parar. Aguente com suas vidas!", arc_classic: "Clássico", arc_cpu: "Contra CPU", arc_horde: "Horda (mísseis)", arc_classic_d: "Sem power-ups · coma todas as bolas", arc_cpu_d: "Com power-ups · supere o rival", arc_horde_d: "Só mísseis · sobreviva", arc_over: "FIM DE JOGO", arc_reached: "Chegou a", arc_new_record: "★ NOVO RECORDE!", arc_best: "Recorde", arc_record_short: "Recorde", custom_mode: "Modo", custom_powerups: "Power-ups", custom_diff: "Dificuldade", custom_size: "Tamanho do mapa", custom_start: "JOGAR", custom_locked: "🔒 Bloqueado", unlock_world: w => `Complete o Mundo ${w} na Aventura para desbloquear`, unlock_level: n => `Complete o nível ${n} na Aventura para desbloquear`, custom_none: "Nenhum", cm_CPU: "Contra CPU", cm_CLASSIC: "Clássico", cm_HUNT: "Caça", cm_INVISIBLE: "Invisíveis", cm_BLACKOUT: "Apagão", cm_TIMETRIAL: "Contra o tempo", cm_DYNAMIC_WALLS: "Muros móveis", cm_PORTALS: "Portais", cm_HORDE: "Horda", cm_GHOST_MODE: "Seja o fantasma",
+    custom_title: "PARTIDA PERSONALIZADA", arcade: "Arcade", arcade_title: "ARCADE", arcade_sub: "Níveis infinitos. A dificuldade sobe sem parar. Aguente com suas vidas!", pause_title: "PAUSA", pause_resume: "▶ Retomar", pause_mute: "🔊 Silenciar tudo", pause_unmute: "🔇 Ativar som", pause_help: "📖 Instruções", pause_exit: "✖ Sair", pause_goal: "Objetivo", pause_effect: "Efeito", mp_no_pause: "indisponível online", arc_classic: "Clássico", arc_cpu: "Contra CPU", arc_horde: "Horda (mísseis)", arc_classic_d: "Sem power-ups · coma todas as bolas", arc_cpu_d: "Com power-ups · supere o rival", arc_horde_d: "Só mísseis · sobreviva", arc_over: "FIM DE JOGO", arc_reached: "Chegou a", arc_new_record: "★ NOVO RECORDE!", arc_best: "Recorde", arc_record_short: "Recorde", custom_mode: "Modo", custom_powerups: "Power-ups", custom_diff: "Dificuldade", custom_size: "Tamanho do mapa", custom_start: "JOGAR", custom_locked: "🔒 Bloqueado", unlock_world: w => `Complete o Mundo ${w} na Aventura para desbloquear`, unlock_level: n => `Complete o nível ${n} na Aventura para desbloquear`, custom_none: "Nenhum", cm_CPU: "Contra CPU", cm_CLASSIC: "Clássico", cm_HUNT: "Caça", cm_INVISIBLE: "Invisíveis", cm_BLACKOUT: "Apagão", cm_TIMETRIAL: "Contra o tempo", cm_DYNAMIC_WALLS: "Muros móveis", cm_PORTALS: "Portais", cm_HORDE: "Horda", cm_GHOST_MODE: "Seja o fantasma",
     pad_connected: "🎮 Controle conectado",
     inverted: "CONTROLES INVERTIDOS",
     adv_title: "MODO AVENTURA",
@@ -1753,7 +1772,7 @@ const I18N = {
     world: "WELT",
     use_power_times: n => `Nutze das Power-up ${n} Mal erfolgreich.`,
     eat_dots: d => `Friss mindestens ${d} Punkte.`,
-    custom_title: "EIGENES SPIEL", arcade: "Arcade", arcade_title: "ARCADE", arcade_sub: "Endlose Level. Die Schwierigkeit steigt immer weiter. Halte mit deinen Leben durch!", arc_classic: "Klassisch", arc_cpu: "Gegen CPU", arc_horde: "Horde (Raketen)", arc_classic_d: "Keine Power-ups · friss alle Punkte", arc_cpu_d: "Power-ups · übertriff den Gegner", arc_horde_d: "Nur Raketen · überlebe", arc_over: "SPIEL VORBEI", arc_reached: "Erreicht", arc_new_record: "★ NEUER REKORD!", arc_best: "Rekord", arc_record_short: "Rekord", custom_mode: "Modus", custom_powerups: "Power-ups", custom_diff: "Schwierigkeit", custom_size: "Kartengröße", custom_start: "SPIELEN", custom_locked: "🔒 Gesperrt", unlock_world: w => `Schließe Welt ${w} im Abenteuer ab zum Freischalten`, unlock_level: n => `Schließe Level ${n} im Abenteuer ab zum Freischalten`, custom_none: "Keine", cm_CPU: "Gegen CPU", cm_CLASSIC: "Klassisch", cm_HUNT: "Jagd", cm_INVISIBLE: "Unsichtbar", cm_BLACKOUT: "Blackout", cm_TIMETRIAL: "Zeitrennen", cm_DYNAMIC_WALLS: "Bewegliche Wände", cm_PORTALS: "Portale", cm_HORDE: "Horde", cm_GHOST_MODE: "Sei der Geist",
+    custom_title: "EIGENES SPIEL", arcade: "Arcade", arcade_title: "ARCADE", arcade_sub: "Endlose Level. Die Schwierigkeit steigt immer weiter. Halte mit deinen Leben durch!", pause_title: "PAUSE", pause_resume: "▶ Fortsetzen", pause_mute: "🔊 Alles stumm", pause_unmute: "🔇 Ton an", pause_help: "📖 Anleitung", pause_exit: "✖ Beenden", pause_goal: "Ziel", pause_effect: "Effekt", mp_no_pause: "online nicht verfügbar", arc_classic: "Klassisch", arc_cpu: "Gegen CPU", arc_horde: "Horde (Raketen)", arc_classic_d: "Keine Power-ups · friss alle Punkte", arc_cpu_d: "Power-ups · übertriff den Gegner", arc_horde_d: "Nur Raketen · überlebe", arc_over: "SPIEL VORBEI", arc_reached: "Erreicht", arc_new_record: "★ NEUER REKORD!", arc_best: "Rekord", arc_record_short: "Rekord", custom_mode: "Modus", custom_powerups: "Power-ups", custom_diff: "Schwierigkeit", custom_size: "Kartengröße", custom_start: "SPIELEN", custom_locked: "🔒 Gesperrt", unlock_world: w => `Schließe Welt ${w} im Abenteuer ab zum Freischalten`, unlock_level: n => `Schließe Level ${n} im Abenteuer ab zum Freischalten`, custom_none: "Keine", cm_CPU: "Gegen CPU", cm_CLASSIC: "Klassisch", cm_HUNT: "Jagd", cm_INVISIBLE: "Unsichtbar", cm_BLACKOUT: "Blackout", cm_TIMETRIAL: "Zeitrennen", cm_DYNAMIC_WALLS: "Bewegliche Wände", cm_PORTALS: "Portale", cm_HORDE: "Horde", cm_GHOST_MODE: "Sei der Geist",
     pad_connected: "🎮 Controller verbunden",
     inverted: "STEUERUNG UMGEKEHRT",
     adv_title: "ABENTEUER-MODUS",
@@ -1868,7 +1887,7 @@ const I18N = {
     world: "世界",
     use_power_times: n => `成功使用道具 ${n} 次。`,
     eat_dots: d => `吃掉至少 ${d} 颗豆子。`,
-    custom_title: "自定义对战", arcade: "街机", arcade_title: "街机模式", arcade_sub: "无限关卡，难度不断上升。用你的生命坚持下去！", arc_classic: "经典", arc_cpu: "对战电脑", arc_horde: "兽群（导弹）", arc_classic_d: "无道具 · 吃光所有豆子", arc_cpu_d: "有道具 · 得分超过对手", arc_horde_d: "仅导弹 · 生存", arc_over: "游戏结束", arc_reached: "到达", arc_new_record: "★ 新纪录！", arc_best: "最高分", arc_record_short: "最高分", custom_mode: "模式", custom_powerups: "道具", custom_diff: "难度", custom_size: "地图大小", custom_start: "开始", custom_locked: "🔒 已锁定", unlock_world: w => `在冒险模式通关第 ${w} 世界以解锁`, unlock_level: n => `在冒险模式通关第 ${n} 关以解锁`, custom_none: "无", cm_CPU: "对战电脑", cm_CLASSIC: "经典", cm_HUNT: "狩猎", cm_INVISIBLE: "隐形", cm_BLACKOUT: "停电", cm_TIMETRIAL: "计时赛", cm_DYNAMIC_WALLS: "移动墙", cm_PORTALS: "传送门", cm_HORDE: "兽群", cm_GHOST_MODE: "你是幽灵",
+    custom_title: "自定义对战", arcade: "街机", arcade_title: "街机模式", arcade_sub: "无限关卡，难度不断上升。用你的生命坚持下去！", pause_title: "暂停", pause_resume: "▶ 继续", pause_mute: "🔊 全部静音", pause_unmute: "🔇 取消静音", pause_help: "📖 说明", pause_exit: "✖ 退出", pause_goal: "目标", pause_effect: "效果", mp_no_pause: "在线不可用", arc_classic: "经典", arc_cpu: "对战电脑", arc_horde: "兽群（导弹）", arc_classic_d: "无道具 · 吃光所有豆子", arc_cpu_d: "有道具 · 得分超过对手", arc_horde_d: "仅导弹 · 生存", arc_over: "游戏结束", arc_reached: "到达", arc_new_record: "★ 新纪录！", arc_best: "最高分", arc_record_short: "最高分", custom_mode: "模式", custom_powerups: "道具", custom_diff: "难度", custom_size: "地图大小", custom_start: "开始", custom_locked: "🔒 已锁定", unlock_world: w => `在冒险模式通关第 ${w} 世界以解锁`, unlock_level: n => `在冒险模式通关第 ${n} 关以解锁`, custom_none: "无", cm_CPU: "对战电脑", cm_CLASSIC: "经典", cm_HUNT: "狩猎", cm_INVISIBLE: "隐形", cm_BLACKOUT: "停电", cm_TIMETRIAL: "计时赛", cm_DYNAMIC_WALLS: "移动墙", cm_PORTALS: "传送门", cm_HORDE: "兽群", cm_GHOST_MODE: "你是幽灵",
     pad_connected: "🎮 手柄已连接",
     inverted: "控制已反转",
     adv_title: "冒险模式",
@@ -1983,7 +2002,7 @@ const I18N = {
     world: "दुनिया",
     use_power_times: n => `पावर-अप ${n} बार सफलतापूर्वक उपयोग करें।`,
     eat_dots: d => `कम से कम ${d} बिंदुएं खाएं।`,
-    custom_title: "कस्टम गेम", arcade: "आर्केड", arcade_title: "आर्केड", arcade_sub: "अनंत स्तर। कठिनाई बढ़ती रहती है। अपनी ज़िंदगियों से टिके रहें!", arc_classic: "क्लासिक", arc_cpu: "CPU के विरुद्ध", arc_horde: "भीड़ (मिसाइल)", arc_classic_d: "बिना पावर-अप · सारी बिंदुएं खाएं", arc_cpu_d: "पावर-अप · प्रतिद्वंद्वी से ज्यादा अंक", arc_horde_d: "केवल मिसाइल · टिके रहें", arc_over: "खेल समाप्त", arc_reached: "पहुंचे", arc_new_record: "★ नया रिकॉर्ड!", arc_best: "रिकॉर्ड", arc_record_short: "रिकॉर्ड", custom_mode: "मोड", custom_powerups: "पावर-अप", custom_diff: "कठिनाई", custom_size: "नक्शा आकार", custom_start: "खेलें", custom_locked: "🔒 लॉक", unlock_world: w => `अनलॉक के लिए एडवेंचर में दुनिया ${w} पूरी करें`, unlock_level: n => `अनलॉक के लिए एडवेंचर में स्तर ${n} पूरा करें`, custom_none: "कोई नहीं", cm_CPU: "CPU के विरुद्ध", cm_CLASSIC: "क्लासिक", cm_HUNT: "शिकार", cm_INVISIBLE: "अदृश्य", cm_BLACKOUT: "अंधेरा", cm_TIMETRIAL: "समय दौड़", cm_DYNAMIC_WALLS: "चलती दीवारें", cm_PORTALS: "पोर्टल", cm_HORDE: "भीड़", cm_GHOST_MODE: "आप भूत हैं",
+    custom_title: "कस्टम गेम", arcade: "आर्केड", arcade_title: "आर्केड", arcade_sub: "अनंत स्तर। कठिनाई बढ़ती रहती है। अपनी ज़िंदगियों से टिके रहें!", pause_title: "रुका", pause_resume: "▶ जारी रखें", pause_mute: "🔊 सब म्यूट", pause_unmute: "🔇 आवाज़ चालू", pause_help: "📖 निर्देश", pause_exit: "✖ बाहर", pause_goal: "लक्ष्य", pause_effect: "प्रभाव", mp_no_pause: "ऑनलाइन उपलब्ध नहीं", arc_classic: "क्लासिक", arc_cpu: "CPU के विरुद्ध", arc_horde: "भीड़ (मिसाइल)", arc_classic_d: "बिना पावर-अप · सारी बिंदुएं खाएं", arc_cpu_d: "पावर-अप · प्रतिद्वंद्वी से ज्यादा अंक", arc_horde_d: "केवल मिसाइल · टिके रहें", arc_over: "खेल समाप्त", arc_reached: "पहुंचे", arc_new_record: "★ नया रिकॉर्ड!", arc_best: "रिकॉर्ड", arc_record_short: "रिकॉर्ड", custom_mode: "मोड", custom_powerups: "पावर-अप", custom_diff: "कठिनाई", custom_size: "नक्शा आकार", custom_start: "खेलें", custom_locked: "🔒 लॉक", unlock_world: w => `अनलॉक के लिए एडवेंचर में दुनिया ${w} पूरी करें`, unlock_level: n => `अनलॉक के लिए एडवेंचर में स्तर ${n} पूरा करें`, custom_none: "कोई नहीं", cm_CPU: "CPU के विरुद्ध", cm_CLASSIC: "क्लासिक", cm_HUNT: "शिकार", cm_INVISIBLE: "अदृश्य", cm_BLACKOUT: "अंधेरा", cm_TIMETRIAL: "समय दौड़", cm_DYNAMIC_WALLS: "चलती दीवारें", cm_PORTALS: "पोर्टल", cm_HORDE: "भीड़", cm_GHOST_MODE: "आप भूत हैं",
     pad_connected: "🎮 गेमपैड कनेक्ट हुआ",
     inverted: "नियंत्रण उल्टे",
     adv_title: "एडवेंचर मोड",
@@ -2098,7 +2117,7 @@ const I18N = {
     world: "العالم",
     use_power_times: n => `استخدم القوة بنجاح ${n} مرات.`,
     eat_dots: d => `كل ما لا يقل عن ${d} نقطة.`,
-    custom_title: "مباراة مخصصة", arcade: "أركيد", arcade_title: "أركيد", arcade_sub: "مستويات لا نهائية. الصعوبة ترتفع باستمرار. اصمد بأرواحك!", arc_classic: "كلاسيكي", arc_cpu: "ضد الكمبيوتر", arc_horde: "حشد (صواريخ)", arc_classic_d: "بدون قوى · كل كل النقاط", arc_cpu_d: "بقوى · تفوّق على الخصم", arc_horde_d: "صواريخ فقط · انجُ", arc_over: "انتهت اللعبة", arc_reached: "وصلت إلى", arc_new_record: "★ رقم قياسي جديد!", arc_best: "الأفضل", arc_record_short: "الأفضل", custom_mode: "النمط", custom_powerups: "القوى", custom_diff: "الصعوبة", custom_size: "حجم الخريطة", custom_start: "العب", custom_locked: "🔒 مقفل", unlock_world: w => `أكمل العالم ${w} في المغامرة لفتحه`, unlock_level: n => `أكمل المستوى ${n} في المغامرة لفتحه`, custom_none: "لا شيء", cm_CPU: "ضد الكمبيوتر", cm_CLASSIC: "كلاسيكي", cm_HUNT: "صيد", cm_INVISIBLE: "خفية", cm_BLACKOUT: "انقطاع", cm_TIMETRIAL: "سباق الزمن", cm_DYNAMIC_WALLS: "جدران متحركة", cm_PORTALS: "بوابات", cm_HORDE: "حشد", cm_GHOST_MODE: "كن الشبح",
+    custom_title: "مباراة مخصصة", arcade: "أركيد", arcade_title: "أركيد", arcade_sub: "مستويات لا نهائية. الصعوبة ترتفع باستمرار. اصمد بأرواحك!", pause_title: "إيقاف مؤقت", pause_resume: "▶ استئناف", pause_mute: "🔊 كتم الكل", pause_unmute: "🔇 تشغيل الصوت", pause_help: "📖 التعليمات", pause_exit: "✖ خروج", pause_goal: "الهدف", pause_effect: "التأثير", mp_no_pause: "غير متاح عبر الإنترنت", arc_classic: "كلاسيكي", arc_cpu: "ضد الكمبيوتر", arc_horde: "حشد (صواريخ)", arc_classic_d: "بدون قوى · كل كل النقاط", arc_cpu_d: "بقوى · تفوّق على الخصم", arc_horde_d: "صواريخ فقط · انجُ", arc_over: "انتهت اللعبة", arc_reached: "وصلت إلى", arc_new_record: "★ رقم قياسي جديد!", arc_best: "الأفضل", arc_record_short: "الأفضل", custom_mode: "النمط", custom_powerups: "القوى", custom_diff: "الصعوبة", custom_size: "حجم الخريطة", custom_start: "العب", custom_locked: "🔒 مقفل", unlock_world: w => `أكمل العالم ${w} في المغامرة لفتحه`, unlock_level: n => `أكمل المستوى ${n} في المغامرة لفتحه`, custom_none: "لا شيء", cm_CPU: "ضد الكمبيوتر", cm_CLASSIC: "كلاسيكي", cm_HUNT: "صيد", cm_INVISIBLE: "خفية", cm_BLACKOUT: "انقطاع", cm_TIMETRIAL: "سباق الزمن", cm_DYNAMIC_WALLS: "جدران متحركة", cm_PORTALS: "بوابات", cm_HORDE: "حشد", cm_GHOST_MODE: "كن الشبح",
     pad_connected: "🎮 تم توصيل وحدة التحكم",
     inverted: "التحكم معكوس",
     adv_title: "وضع المغامرة",
@@ -5232,6 +5251,7 @@ class Game {
     this.screenFlashColor = "#ffe600";
     this.lastFrame = performance.now();
     this.running = false;
+    this.paused = false;
     this.cameraShake = 0;
     this.guestDeathCount = 0;
     this.hostDeathCount = 0;
@@ -8120,6 +8140,7 @@ const screens = {
 
 function showScreen(name) {
   for (const k of Object.keys(screens)) screens[k].classList.toggle("active", k === name);
+  document.body.classList.toggle("in-game", name === "game");
   if (typeof MenuVFX !== "undefined") {
     if (name === "menu") MenuVFX.start(); else MenuVFX.stop();
   }
@@ -8148,6 +8169,7 @@ let _musicMuted = localStorage.getItem(MUSIC_MUTE_KEY) === "1";
 
 function initAudio() {
   sfx.init();
+  sfx.muted = _musicMuted;
   if (sfx.ctx && !music.ctx) {
     music.init(sfx.ctx);
     music.muted = _musicMuted;
@@ -8182,9 +8204,102 @@ muteBtn.addEventListener("click", () => {
   _musicMuted = !_musicMuted;
   localStorage.setItem(MUSIC_MUTE_KEY, _musicMuted ? "1" : "0");
   music.setMute(_musicMuted);
+  sfx.muted = _musicMuted;
   if (!_musicMuted) _resumeMusicForCurrentScreen();
   _updateMuteUI();
 });
+
+// ===================== MENÚ DE PAUSA =====================
+function isMultiplayer() {
+  // En multiplayer real hay un guest humano con vidas y no es soloMode ni aventura/arcade.
+  return !game.soloMode && !game.adventure && game.guest && game.guest.lives > 0;
+}
+
+function togglePause() {
+  if (!game || !game.running || game.gameOver) return;
+  if (game.paused) resumeGame(); else pauseGame();
+}
+
+function pauseGame() {
+  // En multiplayer online no se puede pausar (el otro jugador sigue).
+  if (isMultiplayer()) {
+    showToast(t("pause_title") + " — " + (I18N[LANG].mp_no_pause || "no disponible online"));
+    return;
+  }
+  game.paused = true;
+  const ov = document.getElementById("pause-overlay");
+  document.getElementById("pause-help-box").style.display = "none";
+  _updatePauseMuteLabel();
+  ov.style.display = "flex";
+}
+
+function resumeGame() {
+  game.paused = false;
+  document.getElementById("pause-overlay").style.display = "none";
+}
+
+function _updatePauseMuteLabel() {
+  const b = document.getElementById("pause-mute");
+  if (b) b.textContent = _musicMuted ? t("pause_unmute") : t("pause_mute");
+}
+
+// Instrucciones del nivel/modo actual (reutiliza la info del briefing)
+function _currentLevelInstructions() {
+  if (!game.adventure) {
+    // Modo libre (partida personalizada CPU): descripción genérica del duelo
+    return "<strong>" + t("cm_CPU") + "</strong>";
+  }
+  const cfg = game.adventure.config;
+  const mi = modeInfo(cfg.mode);
+  let goalText = mi.g;
+  if (cfg.mode === "POWERUP_TRIAL") goalText = t("use_power_times", cfg.modeCfg.uses);
+  if ([ "CLASSIC", "INVISIBLE", "BLACKOUT", "TIMETRIAL", "DYNAMIC_WALLS", "PORTALS" ].includes(cfg.mode)) {
+    goalText = t("eat_dots", game.adventure.state.dotsNeeded || cfg.dotGoal);
+  }
+  return "<div style='color:var(--cyan);font-weight:bold;margin-bottom:6px;'>" + mi.n + "</div>" + "<div><span style='color:#bb88ff;'>" + t("pause_effect") + ":</span> " + mi.e + "</div>" + "<div style='margin-top:4px;'><span style='color:#3bff9d;'>" + t("pause_goal") + ":</span> " + goalText + "</div>";
+}
+
+(function initPauseMenu() {
+  const btn = document.getElementById("btn-pause");
+  if (btn) btn.addEventListener("click", () => {
+    initAudio();
+    togglePause();
+  });
+  const resume = document.getElementById("pause-resume");
+  if (resume) resume.addEventListener("click", resumeGame);
+  const mute = document.getElementById("pause-mute");
+  if (mute) mute.addEventListener("click", () => {
+    initAudio();
+    _musicMuted = !_musicMuted;
+    localStorage.setItem(MUSIC_MUTE_KEY, _musicMuted ? "1" : "0");
+    music.setMute(_musicMuted);
+    sfx.muted = _musicMuted;
+    if (!_musicMuted) _resumeMusicForCurrentScreen();
+    _updateMuteUI();
+    _updatePauseMuteLabel();
+  });
+  const help = document.getElementById("pause-help");
+  if (help) help.addEventListener("click", () => {
+    const box = document.getElementById("pause-help-box");
+    if (box.style.display === "none") {
+      box.innerHTML = _currentLevelInstructions();
+      box.style.display = "block";
+    } else {
+      box.style.display = "none";
+    }
+  });
+  const exit = document.getElementById("pause-exit");
+  if (exit) exit.addEventListener("click", () => {
+    game.paused = false;
+    game.running = false;
+    document.getElementById("pause-overlay").style.display = "none";
+    if (mainLoopId) cancelAnimationFrame(mainLoopId);
+    // Cortar conexión si la hubiera y volver al menú
+    try { if (net && net.leave) net.leave(); } catch (e) {}
+    resetAfterAdventure();
+    showScreen("menu");
+  });
+})();
 
 const OPT_MUSIC_VOL_KEY = "neonpac_music_vol_v1";
 
@@ -9677,6 +9792,11 @@ function runHostLoop() {
     if (!game.running) return;
     const dt = Math.min(.05, (now - last) / 1e3);
     last = now;
+    // Pausa (solo en modos de un jugador): congela la simulación pero mantiene el loop.
+    if (game.paused) {
+      mainLoopId = requestAnimationFrame(loop);
+      return;
+    }
     const wasGameOver = game.gameOver;
     game.updateHost(dt);
     netT += dt * 1e3;
@@ -9816,6 +9936,10 @@ const BIND_ACTIONS = [ {
   id: "action",
   label: "Power-up",
   dir: null
+}, {
+  id: "pause",
+  label: "Pausa",
+  dir: null
 } ];
 
 const DEFAULT_KEYBINDS = {
@@ -9823,7 +9947,8 @@ const DEFAULT_KEYBINDS = {
   down: [ "ArrowDown", "KeyS" ],
   left: [ "ArrowLeft", "KeyA" ],
   right: [ "ArrowRight", "KeyD" ],
-  action: [ "Space" ]
+  action: [ "Space" ],
+  pause: [ "Escape" ]
 };
 
 const DEFAULT_PADBINDS = {
@@ -9831,7 +9956,8 @@ const DEFAULT_PADBINDS = {
   down: [ 13 ],
   left: [ 14 ],
   right: [ 15 ],
-  action: [ 0, 1, 2, 3, 5, 7 ]
+  action: [ 0, 1, 2, 3, 5, 7 ],
+  pause: [ 9 ]
 };
 
 let KEYBINDS = loadBinds(KEYBIND_KEY, DEFAULT_KEYBINDS);
@@ -9943,6 +10069,14 @@ window.addEventListener("keydown", e => {
   if (_bindCapture) return;
   const tag = e.target && e.target.tagName;
   if (tag === "INPUT" || tag === "TEXTAREA" || e.target.isContentEditable) return;
+  // Tecla de pausa (Escape por defecto), solo durante una partida
+  if (KEYBINDS.pause && KEYBINDS.pause.includes(e.code)) {
+    if (game && game.running && game.local && !game.gameOver) {
+      e.preventDefault();
+      togglePause();
+      return;
+    }
+  }
   if (isActionKey(e.code)) {
     e.preventDefault();
     activateLocalPower();
@@ -10035,6 +10169,21 @@ function _pollGamepad() {
     return;
   }
   const inGame = game && game.running && game.local && !game.gameOver;
+  // Botón de pausa del mando (Start): alterna la pausa, esté el juego corriendo o pausado.
+  if (inGame) {
+    for (const i of PADBINDS.pause || []) {
+      if (_padButtonPressed(pad, i)) {
+        togglePause();
+        _gp.prevButtons = pad.buttons.map(b => b.pressed);
+        return;
+      }
+    }
+  }
+  // Si está en pausa, no procesar movimiento ni acciones del juego.
+  if (inGame && game.paused) {
+    _gp.prevButtons = pad.buttons.map(b => b.pressed);
+    return;
+  }
   if (inGame) {
     if (_gp.menuHighlight) {
       document.querySelectorAll("button").forEach(b => {
@@ -10052,6 +10201,13 @@ function _pollGamepad() {
     for (const i of actionButtons()) {
       if (_padButtonPressed(pad, i)) {
         activateLocalPower();
+        break;
+      }
+    }
+    // Botón de pausa del mando (Start por defecto)
+    for (const i of PADBINDS.pause || []) {
+      if (_padButtonPressed(pad, i)) {
+        togglePause();
         break;
       }
     }
