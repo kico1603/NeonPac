@@ -512,12 +512,14 @@
   }
   .mute-btn.muted:hover { background: var(--magenta); color: var(--bg); }
 
-  /* Botón de pausa: al lado del de mute (a su izquierda). Solo visible en partida. */
+  /* Botón de pausa: al lado del de mute (a su izquierda). Solo visible en partida offline. */
   .pause-btn {
     right: calc(62px + env(safe-area-inset-right));
     display: none !important;
   }
   body.in-game .pause-btn { display: flex !important; }
+  /* En multijugador online no se puede pausar: ocultar el botón. */
+  body.online .pause-btn { display: none !important; }
 
   @media (max-width: 800px) {
     .setup-intro { font-size: 15px; }
@@ -946,7 +948,7 @@ const firebaseConfig = {
       <span data-i18n="hint_tail">· Come puntos · Esquiva los 6 fantasmas</span>
     </div>
     <div style="position: fixed; bottom: 8px; right: 12px; font-size: 13px; color: var(--muted); font-family: 'Press Start 2P', monospace; letter-spacing: 1px;">
-      v1.9.1
+      v1.9.5
     </div>
   </section>
 
@@ -5516,6 +5518,22 @@ class Game {
       this.ghosts = [];
       this.stars = [];
       this.host.isGhostMode = true;
+      // El jugador ES un fantasma: aparece en la zona de fantasmas, no en el spawn de pac.
+      const gs = this.maze.ghostSpawn;
+      this.host.x = gs.x;
+      this.host.y = gs.y;
+      this.host.dir = { x: 0, y: 0 };
+      this.host.nextDir = { x: 0, y: 0 };
+      // Dejar SOLO 2 bolas de poder en el mapa: así los pacs rara vez pueden cazarte
+      // y cuando uno se empodera es algo puntual y claramente visible.
+      const pelletIdx = [];
+      for (let i = 0; i < this.pellets.length; i++) if (this.pellets[i]) pelletIdx.push(i);
+      for (let i = pelletIdx.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [ pelletIdx[i], pelletIdx[j] ] = [ pelletIdx[j], pelletIdx[i] ];
+      }
+      const keepP = new Set(pelletIdx.slice(0, 2));
+      for (const idx of pelletIdx) if (!keepP.has(idx)) this.pellets[idx] = 0;
       const n = cfg.modeCfg.pacs;
       const colors = [ "#ffd400", "#00f6ff", "#3bff9d" ];
       for (let i = 0; i < n; i++) {
@@ -7696,14 +7714,27 @@ class Game {
     const r = CELL * .46;
     if (p.respawnTimer > 0 && Math.floor(performance.now() / 100) % 2 === 0) return;
     if (p.isGhostMode) {
+      // Si algún pac está empoderado, TÚ eres comible → te pintas de azul (como los
+      // fantasmas asustados del modo clásico). Parpadea cuando el peligro se acaba.
+      const st = this.adventure && this.adventure.state;
+      const danger = st && st.cpuPacs && st.cpuPacs.some(pc => pc.lives > 0 && pc.empoweredTimer > 0);
+      let scaredColor = null;
+      if (danger) {
+        // Tiempo restante máximo entre los pacs empoderados, para el parpadeo final
+        const maxT = Math.max(...st.cpuPacs.filter(pc => pc.lives > 0 && pc.empoweredTimer > 0).map(pc => pc.empoweredTimer));
+        const ending = maxT < 1.5;
+        const blinkOn = ending ? Math.sin(this.elapsedTime * 18) > 0 : true;
+        scaredColor = blinkOn ? "#2a5cff" : "#dfe8ff";
+      }
       ctx.save();
-      ctx.shadowColor = "#ff4040";
+      const col = scaredColor || "#ff4040";
+      ctx.shadowColor = col;
       ctx.shadowBlur = 16;
-      ctx.fillStyle = "#ff4040";
-      ctx.strokeStyle = "#ff4040";
+      ctx.fillStyle = col;
+      ctx.strokeStyle = col;
       drawAlienBody(ctx, 1, px, py, r);
       ctx.shadowBlur = 0;
-      drawAlienEyes(ctx, 1, px, py, r, p.dir, false);
+      drawAlienEyes(ctx, 1, px, py, r, p.dir, !!scaredColor);
       ctx.restore();
       return;
     }
@@ -7903,6 +7934,15 @@ class Game {
             aura.addColorStop(1, "rgba(255, 43, 214, 0)");
             ctx.fillStyle = aura;
             ctx.fillRect(px - CELL * 1.1, py - CELL * 1.1, CELL * 2.2, CELL * 2.2);
+            // Anillo sólido de peligro: hace inconfundible que este pac te caza a TI.
+            ctx.strokeStyle = "#ff2bd6";
+            ctx.lineWidth = 2.5;
+            ctx.shadowColor = "#ff2bd6";
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.arc(px, py, CELL * (.55 + .08 * pulse), 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
             ctx.restore();
           }
         }
@@ -8141,6 +8181,7 @@ const screens = {
 function showScreen(name) {
   for (const k of Object.keys(screens)) screens[k].classList.toggle("active", k === name);
   document.body.classList.toggle("in-game", name === "game");
+  document.body.classList.toggle("online", name === "game" && isMultiplayer());
   if (typeof MenuVFX !== "undefined") {
     if (name === "menu") MenuVFX.start(); else MenuVFX.stop();
   }
@@ -8211,8 +8252,9 @@ muteBtn.addEventListener("click", () => {
 
 // ===================== MENÚ DE PAUSA =====================
 function isMultiplayer() {
-  // En multiplayer real hay un guest humano con vidas y no es soloMode ni aventura/arcade.
-  return !game.soloMode && !game.adventure && game.guest && game.guest.lives > 0;
+  // Es multijugador online si hay una sala de red activa (código asignado).
+  // Los modos offline (aventura, arcade, personalizada) no tienen sala.
+  return typeof net !== "undefined" && !!net.code && !!net.roomRef;
 }
 
 function togglePause() {
